@@ -1,0 +1,1165 @@
+% LaTeX template, xeCJK usepackage and Unicode text need XeLaTeX to compile.
+% MiKTeX package can be downloaded at miktex.org, WinEdt can be downloaded at http://www.winedt.com/.
+% WinEdt 6 and higher provide XeLaTeX and Unicode support.
+
+% LaTeX template version 1.0.4, last revised on 2014-11-17.
+
+\documentclass[10pt]{article}
+
+
+
+% *************************** installed packages *************************
+% AMS packages
+\usepackage{amsfonts}   % TeX fonts from the American Mathematical Society.
+\usepackage{amsmath}    % AMS mathematical facilities for LaTeX.
+\usepackage{amssymb}    % AMS symbols
+\usepackage{amsthm}     % Provide proclamations environment.
+
+% graphics packages
+\usepackage{graphics}   % Standard LaTeX graphics.
+\usepackage{tikz}       % TikZ and PGF package for graphics
+\usetikzlibrary{matrix} % matrix library of TikZ package
+\usetikzlibrary{trees}  % trees library of TikZ package
+
+% support for foreign languages, esp. Chinese.
+\usepackage{xeCJK}      % Support for CJK (Chinese, Japanese, Korean) documents in XeLaTeX.
+\setCJKmainfont{SimSun} % MUST appear when xeCJK is loaded.
+%\setCJKmainfont{DFKai-SB}          % 设置正文罗马族的CKJ字体，影响 \rmfamily 和 \textrm 的字体。此处设为“标楷体”。
+%\setCJKmainfont{SimSun}            % 设置正文罗马族的CKJ字体，影响 \rmfamily 和 \textrm 的字体。此处设为“宋体”。
+%\setCJKmonofont{MingLiU}           % 设置正文等宽族的CJK字体，影响 \ttfamily 和 \texttt 的字体。此处设为“细明体”。
+%\renewcommand\abstractname{摘要}   % 重定义摘要名：abstract->摘要。
+%\renewcommand\appendixname{附录}   % 重定义附录名：appendix->附录。
+%\renewcommand\bibname{参考文献}    % 重定义参考文献名：bibliography->参考文献。
+%\renewcommand\contentsname{目录}   % 重定义目录名：contents->目录。
+%\renewcommand\refname{参考文献}    % 重定义参考文献名：references->参考文献。
+
+% miscellaneous packages
+\usepackage[toc, page]{appendix}   % Extra control of appendices.
+\usepackage{caption}    % Customising captions in floating environments.
+%\captionsetup[figure]{labelformat=empty} % redefines the caption setup of the figures environment in the beamer %class.
+\usepackage{clrscode}   % Typesets pseudocode as in Introduction to Algorithms.
+\usepackage{epsfig}
+\usepackage{eurosym}    % Metafont and macros for Euro sign.
+\usepackage{float}      % Improved interface for floating objects.
+\usepackage{fontspec}   % Advanced font selection in XeLaTeX and LuaLaTeX.
+\usepackage{indentfirst}% Leave no indent for a paragraph after a sectional heading.
+\usepackage{xcolor}     % Driver-independent color extensions for LaTeX and pdfLaTeX.
+
+% must-be-the-last packages
+\usepackage[driverfallback=hypertex, pagebackref]{hyperref}   % Extensive support for hypertext in LaTeX; MUST be on the last \usepackage line in the preamble. [pagebackref] for page referencing; [backref] for section referencing.
+% ********************** end of installed packages ***********************
+
+
+
+% ************************** fullpage.sty ********************************
+% This is FULLPAGE.STY by H.Partl, Version 2 as of 15 Dec 1988.
+% Document Style Option to fill the paper just like Plain TeX.
+\typeout{Style Option FULLPAGE Version 2 as of 15 Dec 1988}
+
+\topmargin 0pt \advance \topmargin by -\headheight \advance
+\topmargin by -\headsep
+
+\textheight 8.9in
+
+\oddsidemargin 0pt \evensidemargin \oddsidemargin \marginparwidth
+0.5in
+
+\textwidth 6.5in
+% For users of A4 paper: The above values are suited for American 8.5x11in
+% paper. If your output driver performs a conversion for A4 paper, keep
+% those values. If your output driver conforms to the TeX standard (1in/1in),
+% then you should add the following commands to center the text on A4 paper:
+
+% \advance\hoffset by -3mm  % A4 is narrower.
+% \advance\voffset by  8mm  % A4 is taller.
+% ************************ end of fullpage.sty ***************************
+
+
+
+% ************** Proclamations (theorem-like structures) *****************
+% [section] option provides numbering within a section.
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+% ************************************************************************
+
+
+
+% ************* Solutions use a modified proof environment ***************
+%\newenvironment{solution}
+%  {\begin{proof}[Solution]}
+%  {\end{proof}}
+% ************************************************************************
+
+
+
+% ************* Frequently used commands as shorthand ********************
+\newcommand{\norm}{|\!|}
+
+
+\newcommand{\s}{\sigma}
+\newcommand{\om}{\omega}
+\newcommand{\prt}[1]{\left( #1 \right)}  % parenthese
+\newcommand{\de}{\delta}
+\newcommand{\pa}{\partial}
+\newcommand{\E}{\mathbb{E}}
+
+% ************************************************************************
+
+
+
+\begin{document}
+
+\title{Note on Volatility Surface}
+\author{S.X}
+\date{Version 1.0, 2018-11-12.}
+
+\maketitle
+
+\begin{abstract}
+The note documents methodologies of volatility surface modeling and calibrations.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Black-Scholes models and implied volatility}\label{sect_BS}
+
+In this section, we review the elements of Black-Scholes model.
+
+\subsection{Black-Scholes model}
+
+The main hypotheses of Black-Scholes model is 
+\begin{enumerate}
+    \item No transaction cost.
+    \item No restrictions on transaction size.
+    \item The market is arbitrage-free.
+    \item The underlying stock price follows geometric Brownian motion under the historical measure $P$
+    \begin{eqnarray}
+          d S_t = \mu S_t dt+\s S_t d W_t
+    \label{GBM}
+    \end{eqnarray}
+    where $W_t$ is a standard Brownian motion, $\mu$ is the drfit and $\s$ the volatility, $\mu$和$\s$ are both constants. 
+    \item Money deposited in the bank is risk free and earns a constant interest rate $r$.    
+\end{enumerate}
+
+\subsection{Self-financing portfolio}
+
+\begin{definition}
+A self-financing strategy is a strategy where where no funds are added
+to or withdrawn from the portfolio after the initial date.
+\end{definition}
+
+\begin{prop}
+    Let $V_t$ be the value of a self-financing portfolio at time $t$ which is consisted of stock and bonds. $\delta_t$ denotes the number of stck in the portfolio then
+    the dynamics of $V_t$ follows
+    \[
+        dV_t =  \prt{V_t - \de_t S_t}rdt + \de_tdS_t   
+    \]
+\end{prop}
+\begin{proof}
+    $B_t$ denotes the value of bonds in the portfolio at time $t$. 
+    \[
+        V_t = \de_t S_t + B_t
+    \]
+
+    At discrete times $\{t_i\}_{i=1}^N$, by condition of self-financing, one can write
+    \begin{eqnarray*}
+        && B_{t_i-} + \de_{t_i-} S_{t_i} =    B_{t_i} + \de_{t_i} S_{t_i}  \\
+        &\Rightarrow&  e^{r(t_i-t_{i-1})}B_{t_{i-1}} + \de_{t_i-} S_{t_i} =  B_{t_i} + \de_{t_i} S_{t_i} 
+    \end{eqnarray*}
+
+    Therefore
+    \begin{eqnarray*}
+         V_{t_i} - V_{t_{i-1}} &=& (e^{r(t_i-t_{i-1})}-1)B_{t_{i-1}}   + \de_{t_{i-1}}(S_{t_i}-S_{t_{i-1}}) \\
+                               &=&  (e^{r(t_i-t_{i-1})}-1)(V_{t_{i-1}} - \de_{t_{i-1}}S_{t_{i-1}}) + \de_{t_{i-1}}(S_{t_i}-S_{t_{i-1}})
+    \end{eqnarray*}
+
+    Pass $\delta t \rightarrow 0$, finally it is obtained
+    \[
+        dV_t =  \prt{V_t - \de_t S_t}rdt + \de_tdS_t   
+    \]
+
+\end{proof}
+
+Suppose $V_t=C(t, S_t)$ where $C(t,S_t)$ is a regulized function. Then $dV_t=fC(t,S_t)$ and by It$\hat{o}$ lemma
+\begin{eqnarray*}
+    d C(t,S_t) &=& \frac{\pa C}{\pa t} d t + \frac{\pa V}{\pa S} d S_t + \frac{\pa^2 V}{\pa S^2}<dS_t,dS_t>  \\
+            &=&\s \frac{\pa C}{\pa S} d W_t + (\frac{\pa C}{\pa t} +\m S_t \frac{\pa C}{\pa S}+\frac{1}{2}\s^2 S_t^2\frac{\pa^2 C}{\pa S^2})dt 
+\end{eqnarray*}
+
+
+Because of $dV_t=dC(t,S_t)$ we necessarily have 
+\begin{eqnarray}
+    \d_t &=& \frac{\pa C(t,S_t)}{\pa S} \nonumber \\
+    rC(t,S) &=& \frac{\pa C}{\pa t} +rS\frac{\pa C}{\pa S} + \frac{1}{2} \s^2 S^2 \frac{\pa^2 C}{\pa S^2} \label{BS_PDE}
+\end{eqnarray}
+
+
+From the above, we can conclude that if function $C(t,S_t)$ satisfies equation(\ref{BS_PDE}), the portfolio with $\de_t=\frac{\pa C(t,S_t)}{\pa S}$ and $B_t=C(t,S_t)-\de_t S_t$ is self-financing.
+By no-arbitrage principle, this implis that the price of an option with payoff $h(S_T)$ is the solution of equation(\ref{BS_PDE}) with the boundary condition $C(T,S)=h(S_T)$.
+
+
+\subsection{Risk-neutral pricing}
+
+By assumption of Black-Scholes model, under the historical measure $P$, 
+\[
+    d S_t = \mu S_t dt+\s S_t d W_t    
+\]
+
+Let $Q$ be an equivalent probability measure of $P$ where 
+\[
+    \left.\frac{dQ}{dP}\right|_{{\cal F}_t} = 
+    \exp\prt{-\frac{\mu - r}{\s} W_t - \frac{(\mu-r)^2}{2\s^2}t}
+\]
+
+By Girsanov theorem $\widehat{W}_t := W_t + \frac{\mu - r}{\s} t$ is a Brownian motion under probability measure $Q$.
+and 
+\[
+    d S_t = \mu S_t dt+\s S_t d \widehat{W}_t    
+\]
+
+Let $\tilde{C}(t, S_t)=e^{-r(T-t)} \E^Q [h(S_T) \vert S_t ] $, then for $s<t$
+\begin{eqnarray*}
+    \E^Q [e^{-rt} \tilde{C}(t,S_t) \vert {\cal{F}}_s ] &=&  \E^Q [e^{-rT}  \E^Q [h(S_T) \vert S_t ] \vert {\cal{F}}_s ]  \\
+    &=& e^{-rT} \E^Q [\E^Q [h(S_T) \vert S_t ] \vert {\cal{F}}_s ] \\
+    &=& e^{-rT} \E^Q [h(S_T) \vert {\cal{F}}_s ]  \qquad  \prt{\textrm{by tower property}}\\
+    &=& e^{-rs} e^{-r(T-s)}\E^Q [h(S_T) \vert {\cal{F}}_s ] \\
+    &=& e^{-rs}\tilde C(s,S_s)
+\end{eqnarray*}
+
+therefore $e^{-rt} \tilde{C}(t,S_t)$ is a Q-martingale.
+
+Another non-rigorous proof can be done by showing
+\[
+    e^{-rt} \tilde{C}(t,S_t) = e^{-rT}  \E^Q [h(S_T) \vert S_t ]  = \E^Q [\frac{h(S_T)}{e^{rT}} \vert S_t ]
+\]
+because the num\'eraire under probability measure $Q$ is money market account(i.e. $e^rt$), therefore $e^{-rt} \tilde{C}(t,S_t)$ is a Q-martingale.
+
+Besides by It$\hat{o}$ we have 
+\[
+    d(e^{-rt}\tilde C(t,S_t)) = e^{-rt} \prt{-r \tilde C+\frac{\pa \tilde C}{\pa t}+rS\frac{\pa \tilde C}{\pa S}+\frac{1}{2}\s^2 S^2 \frac{\pa^2 \tilde C}{\pa S^2}}dt + e^{-rt} \s S\frac{\pa \tilde C}{\pa S} d \widehat{W}_t
+\]
+
+So 
+\[
+    e^{rt}d\prt{e^{-rt}\tilde C(t,S_t)} =  \prt{-r \tilde C+\frac{\pa \tilde C}{\pa t}+rS\frac{\pa \tilde C}{\pa S}+\frac{1}{2}\s^2 S^2 \frac{\pa^2 \tilde C}{\pa S^2}}dt + \s S\frac{\pa \tilde C}{\pa S} d \widehat{W}_t   
+\]
+
+Because $e^{-rt} \tilde{C}(t,S_t)$ is a $Q$-martingale then its drift term is zero, which further shows that $\tilde C(t,S_t)$ is a solution of equation(\ref{BS_PDE}). Because of the uniqueness of the solution we can deduce that 
+the price of the option with payoff $h(S_T)$, which is a solution of equation(\ref{BS_PDE}),  in the Black-Scholes model is 
+\[
+    C(t,S_t) = e^{-r(T-t)}\E^Q(h(S_t e^{r(T-t)-\frac{1}{2}\s^2 (T-t)+\s \widehat{W}_{T-t}})|{\cal{F}}_t)    
+\]
+
+
+The above is a special case of fundamental theorem of asset pricing, which says that a market is arbitrage-free if and only if there exists a probability measure $Q$(i.e. risk neutral measure), equivalent to historical measure $P$ where the instrument price 
+is the discounted expected value of future payoff.  
+
+
+\subsection{Implied volatility}
+
+In the Black-Scholes model, the implied volatility of all options on the same
+underlying must be the same and equal to the historical volatility (standard
+deviation of annualized returns) of the underlying. However, when I is computed
+from market-quoted option prices, one observes that
+\begin{itemize}
+    \item The implied volatility is always greater than the historical volatility of the
+    underlying.
+    \item The implied volatility of different options on the same underlying depend
+    on their strikes and maturity dates.
+\end{itemize}
+
+
+\section{Delta hedging strategies}
+Realized volatility is the amount of noise in the stock price, it is the coefficient
+of the Wiener process in the stock returns model, it is the amount of randomness that actually transpires. Implied volatility is how the
+market is pricing the option currently. Since the market does not have
+perfect knowledge about the future these two numbers can and will be
+different. \footnote{This section is mainly extracted from Derman \cite{Derman} and Willmot \cite{Wilmott}}
+
+\subsection{Hedged option position}
+
+We set up the problem in the following way
+\begin{enumerate}
+    \item Assume the option
+    is hedged at discrete points in time, $t_0, t_1,...t_n$, such that $t_i-t_{i-1}=\de t$ and
+    with tn representing the expiration time of the option.
+    \item Use $C_i = C(t_i, S_i)$ to denote the market price of the option at time $t_i$ when the
+    stock price is $S_i$; use $\Delta_i=\Delta(t_i, S_i)$ to denote the number of shares of
+    the stock S that we short at the start of each period i.
+    \item Any cash received is
+    invested at the riskless rate $r$, and any cash borrowed is funded at the same
+    rate.
+\end{enumerate}
+
+We begin by set up a portfolio $V_0$ by holding the option worth $C_0$. At first time step we hedge it with $\Delta_0$ of the stock. The composition of the portfolio at $t=0$ is shown in table(\ref{table_hedging_ptf_0}). 
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|rr|}
+    \hline Component & Value\\
+    \hline Option&$C_{0}$\\
+        Stock& $-\Delta_0 S_{0}$\\
+        Cash&$\Delta_0 S_{0}$\\
+    \hline
+    \end{tabular}\caption{Portfolio composition and values at $t=t_0$}
+    \label{table_hedging_ptf_0}
+\end{table}
+
+At the second period the composition updates, and one needs to rebalance the delta hedging position, as shown in table(\ref{table_hedging_ptf_1}) 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|rrr|}
+    \hline Component & Value before rebalance & Value after rebalance \\
+    \hline Option  &   $C_{1}$                & $C_{1}$  \\ 
+        Stock      & $-\Delta_0 S_{1}$        & $-\Delta_1 S_{1}$\\
+        Cash      & $\Delta_0 S_0e^{r\de t}$ & $\Delta_0 S_0e^{r\de t}+(\Delta_1-\Delta_0)S_1$ \\
+    \hline
+    \end{tabular}\caption{Portfolio composition and values at $t=t_1$}
+    \label{table_hedging_ptf_1}
+\end{table}
+
+At maturity the total value of the portfolio becomes
+\[
+    V_n = C_n -\Delta_n S_n +\Delta_0 S_0 e^{nr\de t}+(\Delta_1-\Delta_0)S_1 e^{(n-1)r\de t}+(\Delta_2-\Delta_1)S_2 e^{(n-2)r\de t}+ \cdots + (\Delta_n-\Delta_{n-1})S_n
+\]
+
+Let $n \rightarrow \infty$ with $n \de t = t_n-t_0 \equiv T$, we have 
+\[
+    V_T = C_T -\Delta_TS_T +\Delta_0S_0 e^{rT} + \int_0^T  e^{r(T-t)}S_t d\Delta_t   
+\]
+
+In the idealized Black-Scholes world, the option is perfectly hedged at every instant,
+and therefore the final P$\&$L is independent of the stock price path. Because
+the instantaneously hedged option is riskless, the hedging strategy replicates
+a riskless bond and therefore, by the law of one price, must have the same
+final value. Therefore
+\[
+    V_T = C_0e^{rT} = C_T -\Delta_TS_T +\Delta_0S_0 e^{rT} + \int_0^T  e^{r(T-t)}S_t d\Delta_t        
+\]
+
+
+\subsection{Hedging with realized volatility}
+
+We now use $C(t,S_t; \s)$ to denote the Black-Scholes price with volatility $\s$. 
+
+\begin{theorem}
+    By delta hedging with realized volatility, the present value of P$\&$L of a hedged option position is 
+    \[
+        C(S_0,t_0;\s^r)-C(S_0,t_0;\s^i)    
+    \]
+    where $\s^r$ is the realized volatility and $\s^i$ the implied volatility.
+
+    \label{theorem_hedging_real_vol}
+\end{theorem}
+
+
+\begin{proof}
+    For simplicity, we use $C^r = C(S_0,t_0;\s^r), C^i = C(S_0,t_0;\s^i)$
+
+    Initially we buy the option at its implied volatility and hedged at known realized volatility, the hedged portfolio
+    at any time $t$ is given by
+    \[
+        \pi = C^i - \Delta^r S    
+    \]
+
+    After $\de t$ the mark to market profit becomes
+    \begin{eqnarray}
+        d\pi = dC^i - \Delta^r dS - (C^i -\Delta^r S)rdt  
+        \label{hedging_dynamic_real_vol}     
+    \end{eqnarray}
+    where the first term is the increase in the value of the long position in the option, the
+    second is the decrease in the value of the short position in the stock and the last term, $(C^i -\Delta^r S)rdt$, represents the interest on the cost
+    of borrowing an amount $(C^i -\Delta^r S)$ used to set up the initial hedge portfolio.
+
+    Besides if we value an option at $\s^i$ and hedged at $\s^i$, the hedging strategy becomes riskless one that leads to BSM equation, With the riskless
+    hedging strategy, the increase in value of the hedge portfolio should be no different from the interest earned on the position at the riskless rate, meaning 
+    \begin{eqnarray}
+        0 = dC^r - \Delta^r dS - (C^r -\Delta^r S)rdt 
+        \label{hedging_dynamic_riskless}
+    \end{eqnarray}
+    
+    By rearranging the teams in equation (\ref{hedging_dynamic_riskless}) we obtain 
+    \begin{eqnarray}
+        \Delta^r S rdt  - \Delta^r dS = - dC^r + C^r rdt    
+        \label{hedging_dynamic_real_vol_relation}
+    \end{eqnarray} 
+    
+    Substituting equation (\ref{hedging_dynamic_real_vol_relation}) in equation (\ref{hedging_dynamic_real_vol}) we arrive at
+    \[
+        d\pi = dC^i - dC^r - (C^i -C^r)rdt   = e^{rt} d\prt{e^{-rt}(C^i - C^r)}    
+    \]
+
+    The present value of this profit can be obtained by discounting
+    \[
+        e^{-r(t-t_0)}e^{rt} d\prt{e^{-rt}(C^i - C^r)}  = e^{rt_0} d\prt{e^{-rt}(C^i - C^r)} 
+    \] 
+
+    The entire profit of the hedging strategy is 
+    \[
+        e^{rt_0} \int_{t_0}^T d\prt{e^{-rt}(C^i - C^r)} = e^{rt_0} \prt{e^{-rt}(C^i - C^r)} \left. \right|_{t_0}^T
+    \]
+
+    At expiration, when t = T, the value of the option is simply its intrinsic value, where $C^i_T=C^r_T$, therefore the profit is then 
+    \[
+        e^{rt_0}\prt{e^{-rt_0} (C^i_{t_0} - C^r_{t_0})} = C^r_{t_0} - C^i_{t_0}  
+    \] 
+
+\end{proof}
+
+Provided we know the future realized
+volatility and provided that we can hedge continuously, the final P$\&$L
+at the expiration of the option is known and deterministic and is equal to
+the difference between the value of the option based on realized volatility
+and the value of the option based on implied volatility.
+
+
+
+\subsection{Hedging with implied volatility}
+By hedging with implied volatility we are balancing
+the random fluctuations in the mark-to-market option value with the
+fluctuations in the stock price. The evolution of the portfolio value is
+then ‘deterministic’ as we shall see.
+
+
+\begin{theorem}
+    By delta hedging with implied volatility, the present value of P$\&$L of a hedged option position is 
+    \[
+        \frac{1}{2}\prt{(\s^i)^2 - (\s^r)^2 }  \int_{t_0}^T e^{-r(t-t_0)}  S^2_t \Gamma^i dt  
+    \]
+    \label{theorem_hedging_imp_vol}
+\end{theorem}
+
+\begin{proof}
+    By It$\hat{o}$ lemma, we have 
+    \[
+        dC^i =  \Theta^i dt+ \Delta^i dS_t + \frac{1}{2}(\s^r)^2 S^2_t \Gamma^i dt    
+    \]
+
+    then the instantaneous profit of the hedged position is
+    \begin{eqnarray}
+        d\pi_t &=& dC^i - \Delta^i dS - (C^i -\Delta^i S)rdt  \nonumber \\
+        &=&  \Theta^i dt+ \Delta^i dS_t + \frac{1}{2}(\s^r)^2 S^2_t \Gamma^i dt  - \Delta^i dS - (C^i -\Delta^i S)rdt \nonumber \\
+        &=&  \prt{ \Theta^i + \Delta^i rS + \frac{1}{2}(\s^r)^2 S^2_t \Gamma^i -  rC^i }dt 
+        \label{hedging_dynamic_imp_vol_raw}
+    \end{eqnarray}
+
+    Because of Black-Scholes PDE
+    \[
+        \Theta^i + \Delta^i r S_t + \frac{1}{2}(\s^i)^2 S^2_t \Gamma^i - rC^i = 0
+    \]
+    equation(\ref{hedging_dynamic_imp_vol_raw}) becomes
+    \begin{eqnarray*}
+        d\pi_t &=& \prt{ \Theta^i + \Delta^i rS + \frac{1}{2}(\s^r)^2 S^2_t \Gamma^i -  rC^i }dt \\
+            &=& \frac{1}{2}\prt{(\s^i)^2 - (\s^r)^2 } S^2_t \Gamma^i dt
+    \end{eqnarray*}
+
+    Integrate the present value of all of these profits over the life of the
+    option to get a total profit of
+    \[
+        \frac{1}{2}\prt{(\s^i)^2 - (\s^r)^2 }  \int_{t_0}^T e^{-r(t-t_0)}  S^2_t \Gamma^i dt
+    \]
+    
+
+\end{proof}
+
+
+
+\subsection{Hedging with arbitrary constant volatility}
+
+\begin{theorem}
+    By delta hedging with constant volatility $\s^h$, the present value of P$\&$L of a hedged option position is 
+    \[
+        C(S_0,t_0;\s^h)-C(S_0,t_0;\s^i) + \int_{t_0}^T e^{-r(t-t_0)}((\s^r)^2-(\s^h)^2)\frac{S_t^2}{2}\frac{\pa^2 C}{\pa S^2}(S_t,t;\s^h) dt    
+    \]
+\end{theorem}
+
+\begin{proof}
+    Similar with previous proof, the instantaneous profit of the hedged position is
+    \begin{eqnarray}
+        d\pi_t &=& dC^i - \Delta^h dS - (C^i -\Delta^h S)rdt  \nonumber \\
+        &=& \prt{dC^i - dC^h - r(C^i - C^h)dt} + \prt{dC^h - \Delta^h dS  - r(C^h-\Delta^h dS)dt}  
+        \label{hedging_dynamic_const_vol_raw}
+    \end{eqnarray}
+
+    From proofs in Theorem(\ref{theorem_hedging_real_vol}) , we can see that the present values of first term in equation(\ref{hedging_dynamic_const_vol_raw}) equals
+    \[
+        C^h_{t_0} - C^i_{t_0}    
+    \]
+
+    From proofs in Theorem(\ref{theorem_hedging_imp_vol}) , the present value of second item in equation(\ref{hedging_dynamic_const_vol_raw}) arrives
+    \[
+        \frac{1}{2}\prt{(\s^i)^2 - (\s^r)^2 }  \int_{t_0}^T e^{-r(t-t_0)}  S^2_t \Gamma^i dt  
+    \]
+    
+    Therefore the present value of total P$\&$L is 
+    \[
+        C(S_0,t_0;\s^h)-C(S_0,t_0;\s^i) + \int_{t_0}^T e^{-r(t-t_0)}((\s^r)^2-(\s^h)^2)\frac{S_t^2}{2}\frac{\pa^2 C}{\pa S^2}(S_t,t;\s^h) dt   
+    \]
+
+\end{proof}
+
+
+\section{Local volatility models}
+
+In section(\ref{sect_BS}) we see that the Black-Scholes model with constant volatility
+cannot reproduce all the option prices observed in the market for a given underlying
+because their implied volatility varies with strike and maturity.
+
+To take
+into account the market implied volatility smile while staying within a Markovian
+and complete model (one risk factor), a natural solution is to model the
+volatility as a deterministic function of time and the value of the underlying
+\begin{eqnarray}
+  \frac{dS_t}{S_t} = rdt + \s(t, S_t)dW_t  
+  \label{local_vol_sde}
+\end{eqnarray}
+where $r$ is the interest rate, assumed to be constant, and $W_t$ is the Brownian motion
+under the risk-neutral measure $Q$. The equation(\ref{local_vol_sde}) defines a \emph{local volatility
+model}.
+
+
+By the same procedure of building self-financing portfolio, shown in section(\ref{sect_BS}), we see that the price of an option with payoff $h(S_T)$ at date date $T$ is given by 
+\[
+    C(t,S_t) = \E^Q [ e^{-r(T-t)}h(S_T) \vert S_t  ]    
+\]
+and is characterized by the partial differential equation
+\[
+    rC(t,S) = \frac{\pa C}{\pa t} +rS\frac{\pa C}{\pa S} + \frac{1}{2} \s(t,S)^2 S^2 \frac{\pa^2 C}{\pa S^2}, \quad C(T,S)=h(S)    
+\]
+
+The pricing equation has the same form
+as in the Black-Scholes model, but one can no longer deduce an explicit pricing
+formula, because the volatility is now a function of the underlying.
+
+
+Practicioners have adopted a \emph{model calibration} approach which allows
+to use all observed prices of quoted options as an input for their pricing and
+hedging activities. The parameters
+obtained by calibration are of course different from those which would be
+obtained by historical estimation. But this does not imply any problem related
+to the presence of arbitrage opportunities.
+
+
+The model calibration approach is adopted in view of the fact that financial
+markets do not obey to any fundamental law except the simplest no-dominance
+or the slightly stronger no-arbitrage. There is no universally
+accurate model in finance, and any proposed model is wrong. Therefore,
+practitioners primarily base their strategies on comparison between assets, this
+is exactly what calibration does.
+
+\subsection{Dupire's formula}
+
+\begin{theorem}
+If $S_t$ follows
+\[
+    \frac{dS_t}{S_t} = rdt + \s(t, S_t)dW_t, S_{t_0} = S_0      
+\]
+\end{theorem}
+and suppose that
+\begin{enumerate}
+    \item $S_t$ is square integrable, i.e. $\E [ \int_{t_0}^T S_t^2 dt ] < \infty$, $\forall T$.
+    \item For $\forall t > t_0$, $S_t$ has a density $p(t, x)$ which is continue on $(t_0, \infty) \times (0, \infty)$.
+    \item Diffusion coeffient $\s(t, x)$ is continue on $(t_0, \infty) \times (0, \infty)$.
+\end{enumerate}
+
+Then the value of the call option $C(T, K)=e^{-r(T-t)}\E [(S_T - K)^{+}]$ satisfies Dupire's equation
+\[
+    \frac{\pa C}{\pa T} = \frac{\s(T,K)^2 K^2}{2} \frac{\pa^2 C}{\pa K^2} - rK\frac{\pa C}{\pa K} ,  \quad (T,K) \in [t_0, \infty) \times [0, \infty) 
+\] 
+with the initial condition $C(t_0, K) = (S_0 - K)^+$
+
+\begin{proof}
+ Please see section (10.3) in Touzi \cite{Touzi}. 
+\end{proof}
+
+
+\subsubsection{Calibration of local volatility models}
+Modelling local volatility by Dupire's formula is criticized for: 
+\begin{itemize}
+    \item Market prices are not known for all strikes and all maturities. They must
+    be interpolated and the final result is very sensitive to the interpolation
+    method used.
+    \item The only risk factor is underlying price and therefore is impossible to incorporate 
+    volatility risk.
+    \item Because of the need to calculate the second derivative of the option price
+    function $C(T, K)$, small data errors lead to very large errors in the solution
+    (ill-posed problem).
+\end{itemize}
+
+Due to these two problems, in practice, Dupire's formula is not used directly
+on the market prices. To avoid solving the ill-posed problem, practitioners
+typically use one of two approaches to calibrate the model:
+\begin{enumerate}
+    \item Start by a preliminary calibration of a parametric functional form to the
+    implied volatility surface (for example, a function quadratic in strike and
+    exponential in time may be used). With this smooth parametric function,
+    recalculate option prices for all strikes, which are then used to calculate
+    the local volatility by Dupire's formula.
+    \item Reformulate Dupire's equation as an optimization problem by introducing
+    a penalty term to limit the oscillations of the volatility surface.
+\end{enumerate}
+
+
+\section{Stochastic volatility models}
+
+\begin{eqnarray*}
+    &&\frac{d S_t}{S_t} = \mu_t dt + \s_t dW_t   \\
+    &&d \s_t = a_t dt + b_t d W^{'}_t, \quad d<W, W^{'}>=\rho dt
+\end{eqnarray*}
+where $a_t=a(t, \s_t, S_t), b_t=b(t, \s_t, S_t)$, $\rho \in (-1, 1)$. Because there are two source of risks, two underlyings are desired for hedging the risks. 
+
+Assume there exists a liquid underlying with the price
+\[
+    C_t^0=C^0(t, \s_t, S_t)    
+\]
+where the deterministic function $C^0(t, \s_t, S_t)$ is known and $\frac{\pa C^0(t, \s, S)}{\pa \s} > 0$ for all $t,\s, S$. Besides some assumptions of assuring the
+existence and regularity of the solution has to be made but not listed in details here.
+
+Use $V_t$ to denote the value of a self-financing portfolio with $\de_t$ stocks and $\om_t$ quantity of $C^0$. By self-financing condition and I't$\hat{o}$ lemma, we have
+\begin{eqnarray}
+    dV_t &&= \prt{V_t - \de_tS_t - \om_tC^0_t} rdt + \de_tS_t + \om_tC^0_t \nonumber \\
+    && =  \prt{V_t - \de_tS_t - \om_tC^0_t} rdt + \prt{\de_t + \om_t \frac{\pa C^0}{\pa S}}dS_t + \om_t \frac{\pa C^0}{\pa \s} d\s_t + \om_t {\cal{L}}_t C^0 dt
+    \label{sto_vol_self_financing}
+\end{eqnarray}
+where 
+\[
+    {\cal{L}}_t = \frac{\pa}{\pa t} + \frac{1}{2} S_t^2 \s_t^2 \frac{\pa^2}{\pa S^2} + \frac{1}{2} b_t^2 \s_t^2 \frac{\pa^2}{\pa \s^2} + S_t\s_t b_t\rho \frac{\pa^2}{\pa S \pa \s}
+\]
+
+Suppose this self-financing portfolio replicates a deterministic payoff function $C: V_t =C(t, \s_t, S_t)$. By I't$\hat{o}$ lemma, it is obtained that
+\[
+    dV_t = {\cal{L}}_tC dt = {\cal{L}}_t C dt + \frac{\pa C}{ \pa S}dS_t + \frac{\pa C}{ \pa \s}d\s_t 
+\]
+
+To equalize the above dynamics and equation(\ref{sto_vol_self_financing}), we arrive 
+\begin{eqnarray*}
+    && \om_t = \frac{\pa C / \pa \s}{\pa C^0 / \pa \s}   \\
+    && \s_t = \frac{\pa C}{\pa S} - \om_t \frac{\pa C^0}{\pa S}\\
+    && {\cal{L}}_tC - rC + rS_t \frac{\pa C}{\pa S} = \frac{\pa C}{\pa \s}  \frac{{\cal{L}}_t C^0 - rC^0 + rS_t \frac{\pa C^0}{\pa S}}{\pa C^0 / \pa \s}
+\end{eqnarray*}
+
+Set $\lambda = - \frac{{\cal{L}}_t C^0 - rC^0 + rS_t \frac{\pa C^0}{\pa S}}{\pa C^0 / \pa \s}$, note that $\lambda$ does not depend on values of option that we are going to hedge, but 
+only on values of the stock that has been chosen initially. By replication we arrive at the equation that the price of the option with payoff $h(S_T)$ satisfies
+\[
+    {\cal{L}}_tC - rC + rS_t \frac{\pa C}{\pa S} + \lambda(t, \s, S) \frac{\pa C}{\pa \s}= 0, \quad C(T, \s, S) = h(S)    
+\] 
+where 
+\[
+    {\cal{L}}_t = \frac{\pa}{\pa t} + \frac{1}{2} S_t^2 \s_t^2 \frac{\pa^2}{\pa S^2} + \frac{1}{2} b_t^2 \s_t^2 \frac{\pa^2}{\pa \s^2} + S_t\s_t b_t\rho \frac{\pa^2}{\pa S \pa \s}   
+\]
+
+This is the generalization of the Black-Scholes equation with stochastic volatility. The hedging strategy with two types of underlyings whose hedging ratio satisfying $\om_t = \frac{\pa C / \pa \s}{\pa C^0 / \pa \s}$ and 
+$\s_t = \frac{\pa C}{\pa S} - \om_t \frac{\pa C^0}{\pa S}$ is called delta-vega hedging(risk of vega is risk of volatility).
+
+
+\subsection{Pricing formula of caplet and calibration to caps market}
+
+Consider the Libor rate for time period $[T_s, T_e]$, which is fixed at time $t_f \le T_s$. The market quotes give Black volatilities of caplets for various strikes. Suppose a caplet has strike $K$ and the year fraction of $[T_s, T_e]$ is $\tau$. The market price for this caplet is
+\[
+V_0^{mkt} = P(0,T_e)\tau \mbox{Bl}(K, F, \sigma_B\sqrt{t_f}, 1)
+\]
+where $F=F(0;T_s, T_e)$ is the forward rate for $[T_s, T_e]$ at time $0$, $\sigma_B$ is the market quoted Black vol, and $\mbox{Bl}(K,F,v,w)$ is given by
+\[
+\mbox{Bl}(K,F,v,w)=Fw\Phi(wd_1) - Kw\Phi(wd_2), \; d_1 = \frac{\ln(F/K)+v^2/2}{v}, \; d_2 = \frac{\ln(F/K)-v^2/2}{v}
+\]
+
+The theoretical price of the above caplet based on one-factor LGM model is
+\[
+V_0^{model} = P(0,T_e)\tau \mbox{Bl}\left(K+\frac{1}{\tau}, F+\frac{1}{\tau}, \left[H(T_e)-H(T_s)\right] \sqrt{\zeta_{t_f}}, 1\right)
+\]
+where $H(t) = \int_0^t e^{-\kappa s}ds$ and $\zeta_t = \int_0^t e^{2\kappa s}\sigma_s^2 ds$ ($\sigma_{\cdot}$ is the volatility parameter in the corresponding one-factor Hull-White model).
+
+Therefore, calibration to caplets in order to obtain $\zeta_{t_f}$ requires solving the following equation
+\[
+\boxed{
+\mbox{Bl}(K, F, \sigma_B\sqrt{t_f}, 1) = \mbox{Bl}\left(K+\frac{1}{\tau}, F+\frac{1}{\tau}, \left[H(T_e)-H(T_s)\right] \sqrt{\zeta_{t_f}}, 1\right)
+}
+\]
+We note $\mbox{Bl}(K, F, v, 1)$ is a monotone increasing function of $v$ with a range of $((F-K)^+, F)$. So the above calibration equation always has a solution.
+
+\subsection{Interpolation of LGM model parameter $\zeta$}
+
+We assume there is a coupon period $[t_s, t_e]$ and we are given the values of $\zeta$ at $t_s$ and $t_e$:
+$\zeta_s$ and $\zeta_e$, respectively. If the volatility of one-factor Hull-White model (equivalent to one-factor
+LGM model) is a constant $\sigma$ over $[t_s, t_e]$, we have for $t\in [t_s, t_e]$
+\[
+\zeta_t =
+\begin{cases}
+\zeta_s + \sigma^2(t-t_s) & \mbox{if $\kappa=0$} \\
+\zeta_s + \sigma^2 \frac{e^{2\kappa t} - e^{2\kappa t_s}}{2\kappa} & \mbox{if $\kappa \ne 0$}
+\end{cases}
+\]
+
+By setting $t$ to $t_e$, we can solve for $\sigma$:
+\[
+\sigma =
+\begin{cases}
+\frac{\zeta_s(t_e-t)+\zeta_e(t-t_s)}{t_e-t_s} & \mbox{if $\kappa=0$} \\
+\frac{e^{2\kappa(t_e-t_s)} - e^{2\kappa(t-t_s)}}{e^{2\kappa(t_e-t_s)}-1}\zeta_s + \frac{e^{2\kappa(t-t_s)}-1}{e^{2\kappa(t_e-t_s)}-1}\zeta_e & \mbox{if $\kappa \ne 0$}
+\end{cases}
+\]
+
+\section{Elements of two-factor LGM model}\label{sect_LGM2F}
+
+\subsubsection{Approximate formula}
+
+Same as the one-factor case, the pricing formula of swaption can be written as
+\[
+V^{opt}_{rec}(0) = L_0 E^{Q_L}[(K^{adj}- S(t_{ex}))^+],
+\]
+where
+\[
+L(t) = \sum_{i=1}^n\tau_i P(t,t_i)
+\]
+($t\le t_0$, $i=1,\cdots, n$) is the annuity numeraire,
+$S(t)=\frac{P(t,t_0)-P(t,t_n)}{\sum_{i=1}^n\tau_iP(t,t_i)}$ is the
+forward swap rate, and $Q_L$ is the martingale measure associated with
+annuity numeraire. By the equivalent vol technique, we have (see Hagan
+\cite{Haganb}, formula(3.66a))
+\begin{eqnarray}\label{formula_HW2F_calib_normal_vol}
+\boxed{
+\sigma_N^2t_{ex} = {\bf H}_{tot} \cdot \zeta {\bf H}_{tot}
+}
+\end{eqnarray}
+where
+\[
+{\bf H}_{tot} = \frac{S(0)\sum_{i=1}^n \tau_i D_i \Delta {\bf H}_i +
+D_n\Delta {\bf H}_n}{\sum_{i=1}^n\tau_iD_i}
+\]
+and $\Delta {\bf H}_i = {\bf H}_i - {\bf H}_0$. This allows us to
+obtain the swaption price by Black's formula with normal vol $\sigma_N
+= \sqrt{\frac{{\bf H}_{tot}\cdot \zeta_{t_{ex}}{\bf
+H}_{tot}}{t_{ex}}}$:
+\begin{eqnarray}\label{formula_HW2F_swaption_approximate}
+\boxed{
+V_{rec}^{opt}(0) = L_0
+\left[(K^{adj}-S(0))\Phi(-d_1)+\frac{\sigma_N\sqrt{t_{ex}}}{\sqrt{2\pi}}e^{-d_1^2/2}\right]
+}
+\end{eqnarray}
+where $\Phi(\cdot)$ is the c.d.f. of standard normal distribution and
+$d_1 = \frac{S(0)-K^{adj}}{\sigma_N \sqrt{t_{ex}}}$.
+
+\subsection{Calibration to ATM swaption market}
+
+For a given sequence of expiries $t_{ex}^0 < t_{ex}^1 < \cdots <
+t_{ex}^N$, we shall use the approximate formula
+(\ref{formula_HW2F_calib_normal_vol}) to obtain $\zeta(t^i_{ex})$,
+$i=1,\cdots, N$. In the case of one-factor model, formula
+(\ref{formula_HW2F_calib_normal_vol}) alone is able to produce
+$\zeta_{t_{ex}}$; in the case of two-factor model, formula
+(\ref{formula_HW2F_calib_normal_vol}) is one equation for two unknowns
+(assuming $\alpha$ or $\sigma$ is piecewise constant). So we typically
+need a sequence of swaptions to deduce $(\zeta_{t^i_{ex}})_{i=1}^N$ by
+bootstrapping.
+
+More precisely, suppose the tenors are $T_1$, $T_2$, $\cdots$, $T_M$.
+Formula (\ref{formula_HW2F_calib_normal_vol}) gives us
+\[
+(\sigma_N^{ij})^2 t^i_{ex} - {\bf H}^{ij}_{tot} \cdot
+\zeta_{t^{i-1}_{ex}} {\bf H}^{ij}_{tot} = {\bf H}^{ij}_{tot} \cdot
+(\zeta_{t^i_{ex}} - \zeta_{t^{i-1}_{ex}}) {\bf H}^{ij}_{tot},
+\]
+where ${\bf H}^{ij}_{tot}$ is the quantity similar to the one in
+formula (\ref{formula_HW2F_calib_normal_vol}) and corresponds to the
+$t_{ex}^i\times T^j$ swaption, and $\sigma_N^{ij}$ is the normal vol
+for the $t_{ex}^i \times T^j$ swaption. Then $\zeta_{t^i_{ex}}$ is
+defined via $\alpha$ or $\sigma$ (recall $\zeta_t =
+\int_0^t\alpha_s^2ds=\int_0^te^{2\kappa s}\sigma_s^2ds$) such that
+\[
+\sum_{j=1}^M \left\{{\bf H}^{ij}_{tot} \cdot (\zeta_{t^i_{ex}} -
+\zeta_{t^{i-1}_{ex}}) {\bf H}^{ij}_{tot} - \left[(\sigma_N^{ij})^2
+t^i_{ex} - {\bf H}^{ij}_{tot} \cdot \zeta_{t^{i-1}_{ex}} {\bf
+H}^{ij}_{tot}\right]\right\}^2\omega_{ij}^2
+\]
+is minimized (assuming $\zeta_{t_{ex}^{i-1}}$ is already determined).
+Here $(\omega_{ij})_{0\le i \le N, 1\le j \le M}$ is a weight matrix.
+To represent $\zeta_t$ in terms of $\alpha$ or $\sigma$, we note for
+$s<t$,
+\[
+\zeta_t - \zeta_s =
+\begin{cases}
+\left(\begin{matrix} \alpha_1^2(t-s) & \rho \alpha_1\alpha_2(t-s) \\
+\rho \alpha_1\alpha_2(t-s) & \alpha_2^2(t-s) \end{matrix} \right)&
+\mbox{if $\alpha$ is constant in $[s,t]$} \\
+\left(\begin{matrix}
+\sigma_1^2\frac{e^{-2\kappa_1s}-e^{-2\kappa_1t}}{2\kappa_1} & \rho
+\sigma_1\sigma_2\frac{e^{-(\kappa_1+\kappa_2)s} -
+e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} \\ \rho \sigma_1\sigma_2
+\frac{e^{-(\kappa_1+\kappa_2)s} -
+e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} &
+\sigma_2^2\frac{e^{-2\kappa_2s}-e^{-2\kappa_2t}}{2\kappa_2}
+\end{matrix} \right) & \mbox{if $\sigma$ is constant in $[s,t]$}
+\end{cases}
+\]
+
+Then (recall ${\bf H}_{tot}=(H_{tot}^1, H_{tot}^2)$)
+\begin{eqnarray*}
+& & {\bf H}_{tot}\cdot (\zeta_t - \zeta_s) {\bf H}_{tot} \\
+&=& (H^1_{tot})^2(\zeta_t-\zeta_s)_{11} + 2 H^1_{tot}
+H^2_{tot}(\zeta_t-\zeta_s)_{12} + (H^2_{tot})^2(\zeta_t-\zeta_s)_{22}
+\\
+&=&
+\begin{cases}
+\left[(H_{tot}^1)^2\alpha_1^2 + 2 H_{tot}^1
+H_{tot}^2\rho\alpha_1\alpha_2 + (H_{tot}^2)^2\alpha_2^2 \right](t-s) &
+\mbox{if $\alpha$ is constant in $[s,t]$} \\
+(H_{tot}^1)^2\frac{e^{-2\kappa_1s}-e^{-2\kappa_1t}}{2\kappa_1}\sigma_1^2
++ 2\rho \Delta H_{tot}^1H_{tot}^2 \frac{e^{-(\kappa_1+\kappa_2)s} -
+e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} \sigma_1\sigma_2 & \\
++ (H_{tot}^2)^2\frac{e^{-2\kappa_2s}-e^{-2\kappa_2t}}{2\kappa_2}\sigma_2^2
+& \mbox{if $\sigma$ is constant in $[s,t]$}
+\end{cases} \\
+&=&
+\begin{cases}
+\alpha\cdot {\bf A} \alpha & \mbox{if $\alpha$ is constant in $[s,t]$} \\
+\sigma\cdot {\bf A} \sigma & \mbox{if $\sigma$ is constant in $[s,t]$}
+\end{cases} \\
+\end{eqnarray*}
+where $\alpha = (\alpha^1, \alpha^2)$, $\sigma = (\sigma_1, \sigma_2)$, and
+\[
+{\bf A} =
+\begin{cases}
+\left( \begin{matrix}(H_{tot}^1)^2 & \rho H_{tot}^1H_{tot}^2 \\ \rho
+H_{tot}^1H_{tot}^2 & (H_{tot}^2)^2\end{matrix} \right)(t-s) & \mbox{if
+$\alpha$ is constant in $[s,t]$} \\
+\left(\begin{matrix}
+(H_{tot}^1)^2\frac{e^{-2\kappa_1s}-e^{-2\kappa_1t}}{2\kappa_1} & \rho
+H_{tot}^1H_{tot}^2\frac{e^{-(\kappa_1+\kappa_2)s} -
+e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} \\ \rho
+H_{tot}^1H_{tot}^2 \frac{e^{-(\kappa_1+\kappa_2)s} -
+e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} &
+(H_{tot}^2)^2\frac{e^{-2\kappa_2s}-e^{-2\kappa_2t}}{2\kappa_2}
+\end{matrix} \right) & \mbox{if $\sigma$ is constant in $[s,t]$}
+\end{cases}
+\]
+
+Therefore, the calibration problem is reformulated to the following
+optimization problem:
+\begin{eqnarray}\label{formula_HW2F_calib_optimization}
+\boxed{
+\begin{cases}
+\arg_{\alpha_i}\min \sum_{j=1}^M \left\{\alpha_i\cdot {\bf
+A}^{ij}\alpha_i -\left[(\sigma_N^{ij})^2 t_{ex}^i- {\bf H}^{ij}_{tot}
+\cdot \zeta_{t^{i-1}_{ex}} {\bf
+H}^{ij}_{tot}\right]\right\}^2\omega^2_{ij}, \; (i=1,\cdots,N) &
+\mbox{if $\alpha$ is piecewise constant} \\
+\arg_{\sigma_i}\min \sum_{j=1}^M \left\{\sigma_i\cdot {\bf
+A}^{ij}\sigma_i -\left[(\sigma_N^{ij})^2 t_{ex}^i- {\bf H}^{ij}_{tot}
+\cdot \zeta_{t^{i-1}_{ex}} {\bf
+H}^{ij}_{tot}\right]\right\}^2\omega^2_{ij}, \; (i=1,\cdots,N) &
+\mbox{if $\sigma$ is piecewise constant}
+\end{cases}
+}
+\end{eqnarray}
+where for the $i$-th optimization problem to be solved, the first
+$(i-1)$ optimization problems must be already solved.
+
+\subsection{Calibration to CMS spread option}
+
+The calibration of two-factor LGM model to CMS spread option is based
+on a sequence of swaptions  and a sequence of CMS spread options.
+
+More precisely, for a given sequence of expiries $t_{ex}^0 < t_{ex}^1
+< \cdots < t_{ex}^N$ and corresponding sequence of swap maturities
+$T_1, T_2, \cdots, T_N$, formula (\ref{formula_HW2F_calib_normal_vol})
+gives
+\[
+(\sigma_N^i)^2 t_{ex}^i - {\bf H}_{tot}^i \cdot \zeta_{t_{ex}^{i-1}}
+{\bf H}_{tot}^i = {\bf H}_{tot}^i \cdot (\zeta_{t_{ex}^{i}} -
+\zeta_{t_{ex}^{i-1}}) {\bf H}_{tot}^i, \; i=1,\cdots, N,
+\]
+where $\sigma_N^i$ is the normal vol for the $t^i_{ex} \times T_i$
+swaption and ${\bf H}_{tot}^i$ is the quantity similar to the one in
+formula (\ref{formula_HW2F_calib_normal_vol}) corresponding to the
+$t_{ex}^i \times T^i$ swaption.
+
+Assuming $\zeta_{t_{ex}^1}$, $\cdots$, $\zeta_{t_{ex}^{i-1}}$ have
+been given, to find out $\zeta_{t_{ex}^i}$, we repeat what's done in
+ATM calibration and write ${\bf H}_{tot}^i \cdot (\zeta_{t_{ex}^{i-1}}
+- \zeta_{t_{ex}^i}) {\bf H}_{tot}^i$ as
+\[
+{\bf H}_{tot}^i \cdot (\zeta_{t_{ex}^{i}} - \zeta_{t_{ex}^{i-1}}) {\bf
+H}_{tot}^i = \begin{cases}
+\alpha \cdot {\bf A}_i \alpha & \mbox{if $\alpha$ is constant in
+$[t_{ex}^{i-1}, t_{ex}^i]$} \\
+\sigma \cdot {\bf A}_i \sigma & \mbox{if $\sigma$ is constant in
+$[t_{ex}^{i-1}, t_{ex}^i]$} \\
+\end{cases}
+\]
+We further parameterize ${\bf A}_i$ by finding $r_1$, $r_2$, $\phi_0$ such that
+\[
+\frac{{\bf A}_i}{(\sigma_N^i)^2t_{ex}^i - {\bf H}_{tot}^i \cdot
+\zeta_{t_{ex}^{i-1}}{\bf H}_{tot}^i} =
+\left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\ \sin\phi_0 &
+\cos\phi_0 \end{matrix} \right)
+\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
+\end{matrix} \right)
+\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
+\cos\phi_0 \end{matrix} \right)
+\]
+Then the first equation for $\zeta_{t_{ex}^i}$ is
+\[
+1 = \begin{cases}
+\alpha \cdot \left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\
+\sin\phi_0 & \cos\phi_0 \end{matrix} \right)
+\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
+\end{matrix} \right)
+\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
+\cos\phi_0 \end{matrix} \right) \alpha & \mbox{if $\alpha$ is constant
+in $[t_{ex}^{i-1}, t_{ex}^i]$} \\
+\sigma \cdot \left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\
+\sin\phi_0 & \cos\phi_0 \end{matrix} \right)
+\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
+\end{matrix} \right)
+\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
+\cos\phi_0 \end{matrix} \right) \sigma & \mbox{if $\sigma$ is constant
+in $[t_{ex}^{i-1}, t_{ex}^i]$} \\
+\end{cases}
+\]
+
+For the second equation, consider an ATM CMS spread option with payoff
+\[
+[S_1(t_{ex}^i)-S_2(t_{ex}^i)-K]^+
+\]
+at time $t^i_{ex}$, where $S_1$ and $S_2$ are two swap rates, and $K =
+E^{Q_{t_{ex}^i}}[S_1(t_{ex}^i)] - E^{Q_{t_{ex}^i}}[S_2(t_{ex}^i)]$.
+The normal vol of $S_1(t_{ex}^i)-S_2(t_{ex}^i)$ can be quoted directly
+from market, while Hagan's formula gives the normal spread vol as
+\[
+(\sigma_N^{sprd})^2 t_{ex}^i = ({\bf H}_{tot}^1 - {\bf H}_{tot}^2)
+\cdot \zeta_{t_{ex}^i} ({\bf H}_{tot}^1 - {\bf H}_{tot}^2),
+\]
+where ${\bf H}_{tot}^1$ corresponds to $S_1$ and ${\bf H}_{tot}^2$
+corresponds to $S_2$. Matching $\sigma_N^{sprd}$ with market quote
+will give us the second equation for $\zeta_{t^i_{ex}}$.
+
+\medskip
+
+These two equations combined allow us to solve for $\zeta_{t^i_{ex}}$.
+More precisely, we use $x = (x_1, x_2)^T$ to stand for either $\alpha$
+or $\sigma$. On the interval $[t_{ex}^{i-1}, t_{ex}^i]$ we have two
+equations for two unknowns:
+\begin{eqnarray}\label{eqn_alph1_alpha2}
+\begin{cases}
+1 = (x_1,x_2) \cdot \left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\
+\sin\phi_0 & \cos\phi_0 \end{matrix} \right)
+\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
+\end{matrix} \right)
+\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
+\cos\phi_0 \end{matrix} \right) \left(\begin{matrix} x_1 \\ x_2
+\end{matrix} \right) \\
+(\sigma_N^{mkt})^2 t^i_{ex} = ({\bf H}_{tot}^1 - {\bf H}_{tot}^2)
+\cdot \zeta_{t_{ex}^i} ({\bf H}_{tot}^1 - {\bf H}_{tot}^2)
+\end{cases}
+\end{eqnarray}
+where $\sigma_N^{mkt}$ is market quote of the normal spread vol and
+\begin{eqnarray}\label{formula_alpha2zeta}
+\zeta_{t^i_{ex}} = \zeta_{t^{i-1}_{ex}} + \left( \begin{matrix} x_1 &
+0 \\ 0 & x_2 \end{matrix}\right)  {\bf B} \left( \begin{matrix} x_1 &
+0 \\ 0 & x_2 \end{matrix}\right).
+\end{eqnarray}
+where
+\[
+{\bf B} =
+\begin{cases}
+\left( \begin{matrix}1 & \rho  \\ \rho & 1\end{matrix}
+\right)(t_{ex}^i-t_{ex}^{i-1}) & \mbox{if $\alpha$ is constant in
+$[t_{ex}^{i-1},t_{ex}^i]$} \\
+\left(\begin{matrix} \frac{e^{-2\kappa_1
+t_{ex}^{i-1}}-e^{-2\kappa_1t_{ex}^i}}{2\kappa_1} & \rho
+\frac{e^{-(\kappa_1+\kappa_2)t_{ex}^{i-1}} -
+e^{-(\kappa_1+\kappa_2)t_{ex}^i}}{\kappa_1+\kappa_2} \\ \rho
+\frac{e^{-(\kappa_1+\kappa_2)t_{ex}^{i-1}} -
+e^{-(\kappa_1+\kappa_2)t_{ex}^i}}{\kappa_1+\kappa_2} &
+\frac{e^{-2\kappa_2t_{ex}^{i-1}}-e^{-2\kappa_2t_{ex}^i}}{2\kappa_2}
+\end{matrix} \right) & \mbox{if $\sigma$ is constant in
+$[t_{ex}^{i-1},t_{ex}^i]$}
+\end{cases}
+\]
+
+We set the re-parametrization
+\[
+\begin{cases}
+x_1 = r\cos\phi \\
+x_2 = r\sin\phi
+\end{cases}
+\]
+such that the first equation of system (\ref{eqn_alph1_alpha2}) becomes
+$1 = \frac{r^2 \cos^2(\phi-\phi_0)}{r_1^2} +
+\frac{r^2\sin^2(\phi-\phi_0)}{r_2^2}$, or equivalently,
+\begin{eqnarray}\label{formula_phi2r}
+r = \frac{r_1r_2}{\sqrt{r_2^2\cos^2(\phi-\phi_0)+r_1^2\sin^2(\phi-\phi_0)}}.
+\end{eqnarray}
+This allows us to use the following trial-and-error procedure to solve
+system (\ref{eqn_alph1_alpha2}):
+\newline Step 1. try a testing value of $\phi$;
+\newline Step 2. use formula (\ref{formula_phi2r}) to obtain the value of $r$;
+\newline Step 3. obtain the values of $x_1$ and $x_2$ by those of $r$
+and $\phi$;
+\newline Step 4. obtain $\zeta_{t^i_{ex}}$ by formula
+(\ref{formula_alpha2zeta});
+\newline Step 5. use the RHS of the second equation of system
+(\ref{eqn_alph1_alpha2}) to obtain theoretical normal spread vol
+$\sigma_N^{sprd}$;
+\newline Step 6. check the error $|\sigma_N^{sprd} - \sigma_N^{mkt}|$:
+if sufficently small, stop; otherwise, return to Step 1 with a
+different value for $\phi$.
+
+The above procedure has the advantage of reducing problem's
+dimensionality. The cost is a complicated nonlinear equation of the
+unknown $\phi$, such that it becomes hard to analyze the effectiveness
+of global Newton's method:
+\[
+\frac{(\sigma_N^{mkt})^2 t_{ex}^i - ({\bf H}_{tot}^{1} - {\bf
+H}_{tot}^{2}) \cdot \zeta_{t_{ex}^{i-1}}({\bf H}_{tot}^{1} - {\bf
+H}_{tot}^{2})}{r_1^2 r_2^2} = \frac{({\bf H}_{tot}^{1} - {\bf
+H}_{tot}^{2}) \cdot \left(\begin{matrix} \cos\phi & 0 \\ 0 & \sin\phi
+\end{matrix} \right) {\bf B} \left(\begin{matrix} \cos\phi & 0 \\ 0 &
+\sin\phi \end{matrix} \right)({\bf H}_{tot}^{1} - {\bf
+H}_{tot}^{2})}{r_2^2\cos^2(\phi-\phi_0)+r_1^2\sin^2(\phi-\phi_0)}
+\]
+
+
+This equation can actually be simplified to give closed-form solution
+as follows. We define ${\bf h} = {\bf H}_{tot}^{1} - {\bf H}_{tot}^{2}
+= (h_1, h_2)^T$ and ${\bf Q} = \left(\begin{matrix} h_1 & 0 \\ 0 & h_2
+\end{matrix}\right) {\bf B} \left(\begin{matrix} h_1 & 0 \\ 0 & h_2
+\end{matrix}\right)$. Then the equation becomes
+\begin{eqnarray}\label{eqn_phi}
+\frac{(\sigma_N^{mkt})^2 t_{ex}^i - {\bf h} \cdot
+\zeta_{t_{ex}^{i-1}}{\bf h} }{r_1^2 r_2^2} =
+\frac{\left(\begin{matrix} \cos\phi & \sin\phi \end{matrix}\right){\bf
+Q} \left(\begin{matrix} \cos\phi \\ \sin\phi
+\end{matrix}\right)}{r_2^2\cos^2(\phi-\phi_0)+r_1^2\sin^2(\phi-\phi_0)}
+\end{eqnarray}
+
+To solve for $\phi$, we set $C=(\sigma_N^{mkt})^2 t_{ex}^i - {\bf h}
+\cdot \zeta_{t_{ex}^{i-1}}{\bf h}$, $\theta = \phi - \phi_0$, and
+\begin{eqnarray*}
+\hat {\bf Q} &=& \left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\
+-\sin\phi_0 & \cos\phi_0 \end{matrix}\right) {\bf Q}
+\left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\ \sin\phi_0 &
+\cos\phi_0 \end{matrix}\right) \\
+&=&
+\left(
+\begin{matrix}
+Q_{11}\cos^2\phi_0 + Q_{22} \sin^2\phi_0 + 2Q_{12}\sin\phi_0\cos\phi_0
+& (Q_{22}-Q_{11})\sin\phi_0\cos\phi_0 +
+Q_{12}(\cos^2\phi_0-\sin^2\phi_0)\\
+(Q_{22}-Q_{11})\sin\phi_0\cos\phi_0 +
+Q_{12}(\cos^2\phi_0-\sin^2\phi_0) & Q_{11}\sin^2\phi_0 +
+Q_{22}\cos^2\phi_0 - 2Q_{12}\sin\phi_0\cos\phi_0
+\end{matrix}
+\right)
+\end{eqnarray*}
+Then the equation (\ref{eqn_phi}) becomes
+\begin{eqnarray}\label{eqn_theta}
+\sin(2\theta + \gamma) = \frac{C(r_1^2+r_2^2)-r_1^2r_2^2(\hat Q_{11} +
+\hat Q_{22})}{\sqrt{[r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 -
+r_1^2)]^2+ 4r_1^4r_2^4\hat Q_{12}^2}}
+\end{eqnarray}
+where $\gamma$ is determined by
+\begin{eqnarray}\label{eqn_gamma}
+\begin{cases}
+\sin\gamma = \frac{r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 -
+r_1^2)}{\sqrt{[r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 -
+r_1^2)]^2+ 4r_1^4r_2^4\hat Q_{12}^2}} \\
+\cos\gamma = \frac{2r_1^2r_2^2\hat Q_{12}}{\sqrt{[r_1^2r_2^2(\hat
+Q_{11}-\hat Q_{22}) - C(r_2^2 - r_1^2)]^2+ 4r_1^4r_2^4\hat Q_{12}^2}}
+\end{cases}
+\end{eqnarray}
+A necessary and sufficient for equation (\ref{eqn_theta}) to have a solution is
+\[
+\left| C(r_1^2+r_2^2)-r_1^2r_2^2(\hat Q_{11} + \hat Q_{22}) \right|
+\le \sqrt{[r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 - r_1^2)]^2+
+4r_1^4r_2^4\hat Q_{12}^2},
+\]
+which is equivalent to an inequality for a quadratic polynomial of
+$C$. Tedious calculation shows the inequality can be reduced to $C_-
+\le C \le C_+$, where
+\[
+C_{\pm} = \frac{r_1^2\hat Q_{11} + r_2^2 \hat Q_{22}}{2} \pm
+\frac{\sqrt{r_1^4\hat Q_{11}^2 + r_2^4\hat Q_{22}^2 + 4r_1^2r_2^2\hat
+Q_{12}^2}}{2}.
+\]
+Therefore, the necessary and sufficient condition for a successful
+calibration is
+\[
+ - \frac{\sqrt{r_1^4\hat Q_{11}^2 + r_2^4\hat Q_{22}^2 +
+4r_1^2r_2^2\hat Q_{12}^2}}{2}\le (\sigma_N^{mkt})^2t_{ex}^i - \left[
+{\bf h} \cdot \zeta_{t^{i-1}_{ex}} {\bf h} + \frac{r_1^2\hat Q_{11} +
+r_2^2 \hat Q_{22}}{2} \right] \le  \frac{\sqrt{r_1^4\hat Q_{11}^2 +
+r_2^4\hat Q_{22}^2 + 4r_1^2r_2^2\hat Q_{12}^2}}{2}.
+\]
+
+\medskip
+
+Simultaneously, we have discovered the follow procedure to solve
+system (\ref{eqn_alph1_alpha2}) explicitly:
+\newline Step 1: obtain the value of $C = (\sigma_N^{mkt})^2t^i_{ex} -
+{\bf h} \cdot \zeta_{t^{i-1}_{ex}} {\bf h}$ by inserting the value of
+$\sigma_N^{mkt}$, and use it to compute the value of $\gamma$ by
+equation (\ref{eqn_gamma});
+\newline Step 2: invert equation (\ref{eqn_theta}) to obtain the value
+of $\theta$;
+\newline Step 3: use the value of $\theta$ to obtain the value of
+$\phi=\theta+\phi_0$ and compute the value of $r$ by formula
+(\ref{formula_phi2r});
+\newline Step 4: obtain the values of $x_1$ and $x_2$: $x_1 =
+r\cos\phi$, $x_2 = r\sin\phi$;
+\newline Step 5: obtain $\zeta_{t_{ex}^i}$ by formula
+(\ref{formula_alpha2zeta}).
+
+\begin{remark}
+From Step 2, we shall have two representative solutions of $\theta$,
+with the relation
+\[
+\theta^{(1)}+\theta^{(2)} \mod \pi = \frac{\pi}{2}.
+\]
+This leads to two representative solution pairs of $(r,\phi)$ with the relation
+\[
+\begin{cases}
+\phi^{(1)}+\phi^{(2)} \mod \pi = \frac{\pi}{2} \\
+r^{(1)} = \frac{r_1r_2}{\sqrt{r_2^2\cos^2\theta^{(1)} + r_1^2
+\sin^2\theta^{(1)}}} = \frac{r_1r_2}{\sqrt{r_2^2\sin^2\theta^{(2)} +
+r_1^2 \cos^2\theta^{(2)}}}\\
+r^{(2)} = \frac{r_1r_2}{\sqrt{r_2^2\cos^2\theta^{(2)} + r_1^2
+\sin^2\theta^{(2)}}} =
+\frac{r_1r_2}{\sqrt{r_2^2\sin^2\theta^{(1)} + r_1^2 \cos^2\theta^{(1)}}}\\
+\end{cases}
+\]
+\end{remark}
+
+
+\begin{appendix}
+
+
+\end{appendix}
+
+\begin{thebibliography}{99}
+
+\bibitem{Derman} Emanuel Derman and Michael B.Miller. The volatility smile. {\it
+Weiley Financial Series}, 2016.
+
+\bibitem{Wilmott} Riaz Ahmad and Paul Wilmott. Which free lunch would you like today, sir? delta hedging, volatility arbitrage and optimal portfolios. {\it
+WilMott}, 2005.
+
+\bibitem{Touzi} Nizar Touzi. Calcul Stochatique en Finance. {\it
+Lecture Note} {\bf}, PA Math\'ematiques Appliqu\'ees, Ecole Polytechnique, September, 2018.
+
+\bibitem{Tankov} Peter Tankov, Surface de volatilit\'e, {\it
+Lecture Note of Master Mod\'elisation Al\'eatoire \`a Paris 7}, ENSAE ParisTech, February, 2015.
+
+\end{thebibliography}
+
+\end{document} 
