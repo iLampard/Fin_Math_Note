@@ -662,6 +662,46 @@ This is the generalization of the Black-Scholes equation with stochastic volatil
 $\s_t = \frac{\pa C}{\pa S} - \om_t \frac{\pa C^0}{\pa S}$ is called delta-vega hedging(risk of vega is risk of volatility).
 
 
+\subsection{Symmetric principle of implied volatility}
+As in the Black-Scholes model 
+\[
+    \frac{dS_t}{S_t} = rdt + \s dW_t   
+\]
+$e^{-rt}S_t$ is a martingale under risk neutral measure $Q$. We introduce a new measure defined by
+\[
+    \left.\frac{dQ^*}{dQ}\right|_{{\cal F}_t} = \frac{S_t}{e^{rt}S_0}=e^{\s W_t - \frac{1}{2}\s^2 t}
+\]
+then by Girsanov's theorem $W^*_t = W_t - \s t$ is a Brownian Motion under measure $Q^*$. By symmetry property $\tilde{W}=-W^*$ is an equivalent Brownian Motion
+under measure $Q^*$. So we can find that 
+\begin{eqnarray*}
+    e^{2rt}\frac{S^2_0}{S_t} &&= e^{2rt}S_0 e^{-\s W_t - (r-\frac{\s^2}{2})t} \\
+    && = S_0 e^{-\s (W^*_t + \s t) + (r+\frac{\s^2}{2})t}\\
+    && = S_0  e^{-\s W^*_t +(r-\frac{\s^2}{2})t} \\
+    && = S_0  e^{\s \tilde{W}_t +(r-\frac{\s^2}{2})t}
+\end{eqnarray*} 
+which implies that the distribution of $e^{2rt}\frac{S^2_0}{S_t}$ under measure $Q^*$ is the same with that of $S_t$ under measure 
+$Q$. 
+
+\begin{theorem}
+    Use $C^{BS}(K,T,\s), P^{BS}(K,T,\s)$ denote the Black-Scholes call and put price with strike $K$, maturity $T$ and volatility $\s$. Then 
+    \[
+        C^{BS}(K,T,\s) = \frac{K}{s_0e^{rT}}P^{BS}\prt{\frac{(r^{rT}S_0)^2}{K},T,\s}    
+    \]
+\end{theorem}
+\begin{proof}
+
+    By using the result derived before the theorem, we can write 
+    \begin{eqnarray*}
+        C^{BS}(K, T, \s) &&= e^{-rT} \E[(S_T-K)^+] \\
+        &&= e^{-rT} \frac{K}{S_0 e^{rT}} \E \left[ \frac{S_T}{e^{rT}S_0} \prt{\frac{(e^{rT} S_0)^2}{K} - \frac{(e^{rT} S_0)^2}{S_T} }^+ \right] \\
+        &&= e^{-rT} \frac{K}{S_0 e^{rT}} \E^* \left[\prt{\frac{(e^{rT} S_0)^2}{K} - \frac{(e^{rT} S_0)^2}{S_T} }^+  \right] \\
+        &&= e^{-rT} \frac{K}{S_0 e^{rT}} \E^* \left[\prt{\frac{(e^{rT} S_0)^2}{K} - S_0  e^{\s \tilde{W}_t +(r-\frac{\s^2}{2})t} }^+  \right] \\
+        &&=\frac{K}{s_0e^{rT}}P^{BS}\prt{\frac{(r^{rT}S_0)^2}{K},T,\s}  
+    \end{eqnarray*}
+\end{proof}
+
+
+
 \subsection{Pricing formula of caplet and calibration to caps market}
 
 Consider the Libor rate for time period $[T_s, T_e]$, which is fixed at time $t_f \le T_s$. The market quotes give Black volatilities of caplets for various strikes. Suppose a caplet has strike $K$ and the year fraction of $[T_s, T_e]$ is $\tau$. The market price for this caplet is
@@ -749,396 +789,7 @@ V_{rec}^{opt}(0) = L_0
 where $\Phi(\cdot)$ is the c.d.f. of standard normal distribution and
 $d_1 = \frac{S(0)-K^{adj}}{\sigma_N \sqrt{t_{ex}}}$.
 
-\subsection{Calibration to ATM swaption market}
 
-For a given sequence of expiries $t_{ex}^0 < t_{ex}^1 < \cdots <
-t_{ex}^N$, we shall use the approximate formula
-(\ref{formula_HW2F_calib_normal_vol}) to obtain $\zeta(t^i_{ex})$,
-$i=1,\cdots, N$. In the case of one-factor model, formula
-(\ref{formula_HW2F_calib_normal_vol}) alone is able to produce
-$\zeta_{t_{ex}}$; in the case of two-factor model, formula
-(\ref{formula_HW2F_calib_normal_vol}) is one equation for two unknowns
-(assuming $\alpha$ or $\sigma$ is piecewise constant). So we typically
-need a sequence of swaptions to deduce $(\zeta_{t^i_{ex}})_{i=1}^N$ by
-bootstrapping.
-
-More precisely, suppose the tenors are $T_1$, $T_2$, $\cdots$, $T_M$.
-Formula (\ref{formula_HW2F_calib_normal_vol}) gives us
-\[
-(\sigma_N^{ij})^2 t^i_{ex} - {\bf H}^{ij}_{tot} \cdot
-\zeta_{t^{i-1}_{ex}} {\bf H}^{ij}_{tot} = {\bf H}^{ij}_{tot} \cdot
-(\zeta_{t^i_{ex}} - \zeta_{t^{i-1}_{ex}}) {\bf H}^{ij}_{tot},
-\]
-where ${\bf H}^{ij}_{tot}$ is the quantity similar to the one in
-formula (\ref{formula_HW2F_calib_normal_vol}) and corresponds to the
-$t_{ex}^i\times T^j$ swaption, and $\sigma_N^{ij}$ is the normal vol
-for the $t_{ex}^i \times T^j$ swaption. Then $\zeta_{t^i_{ex}}$ is
-defined via $\alpha$ or $\sigma$ (recall $\zeta_t =
-\int_0^t\alpha_s^2ds=\int_0^te^{2\kappa s}\sigma_s^2ds$) such that
-\[
-\sum_{j=1}^M \left\{{\bf H}^{ij}_{tot} \cdot (\zeta_{t^i_{ex}} -
-\zeta_{t^{i-1}_{ex}}) {\bf H}^{ij}_{tot} - \left[(\sigma_N^{ij})^2
-t^i_{ex} - {\bf H}^{ij}_{tot} \cdot \zeta_{t^{i-1}_{ex}} {\bf
-H}^{ij}_{tot}\right]\right\}^2\omega_{ij}^2
-\]
-is minimized (assuming $\zeta_{t_{ex}^{i-1}}$ is already determined).
-Here $(\omega_{ij})_{0\le i \le N, 1\le j \le M}$ is a weight matrix.
-To represent $\zeta_t$ in terms of $\alpha$ or $\sigma$, we note for
-$s<t$,
-\[
-\zeta_t - \zeta_s =
-\begin{cases}
-\left(\begin{matrix} \alpha_1^2(t-s) & \rho \alpha_1\alpha_2(t-s) \\
-\rho \alpha_1\alpha_2(t-s) & \alpha_2^2(t-s) \end{matrix} \right)&
-\mbox{if $\alpha$ is constant in $[s,t]$} \\
-\left(\begin{matrix}
-\sigma_1^2\frac{e^{-2\kappa_1s}-e^{-2\kappa_1t}}{2\kappa_1} & \rho
-\sigma_1\sigma_2\frac{e^{-(\kappa_1+\kappa_2)s} -
-e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} \\ \rho \sigma_1\sigma_2
-\frac{e^{-(\kappa_1+\kappa_2)s} -
-e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} &
-\sigma_2^2\frac{e^{-2\kappa_2s}-e^{-2\kappa_2t}}{2\kappa_2}
-\end{matrix} \right) & \mbox{if $\sigma$ is constant in $[s,t]$}
-\end{cases}
-\]
-
-Then (recall ${\bf H}_{tot}=(H_{tot}^1, H_{tot}^2)$)
-\begin{eqnarray*}
-& & {\bf H}_{tot}\cdot (\zeta_t - \zeta_s) {\bf H}_{tot} \\
-&=& (H^1_{tot})^2(\zeta_t-\zeta_s)_{11} + 2 H^1_{tot}
-H^2_{tot}(\zeta_t-\zeta_s)_{12} + (H^2_{tot})^2(\zeta_t-\zeta_s)_{22}
-\\
-&=&
-\begin{cases}
-\left[(H_{tot}^1)^2\alpha_1^2 + 2 H_{tot}^1
-H_{tot}^2\rho\alpha_1\alpha_2 + (H_{tot}^2)^2\alpha_2^2 \right](t-s) &
-\mbox{if $\alpha$ is constant in $[s,t]$} \\
-(H_{tot}^1)^2\frac{e^{-2\kappa_1s}-e^{-2\kappa_1t}}{2\kappa_1}\sigma_1^2
-+ 2\rho \Delta H_{tot}^1H_{tot}^2 \frac{e^{-(\kappa_1+\kappa_2)s} -
-e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} \sigma_1\sigma_2 & \\
-+ (H_{tot}^2)^2\frac{e^{-2\kappa_2s}-e^{-2\kappa_2t}}{2\kappa_2}\sigma_2^2
-& \mbox{if $\sigma$ is constant in $[s,t]$}
-\end{cases} \\
-&=&
-\begin{cases}
-\alpha\cdot {\bf A} \alpha & \mbox{if $\alpha$ is constant in $[s,t]$} \\
-\sigma\cdot {\bf A} \sigma & \mbox{if $\sigma$ is constant in $[s,t]$}
-\end{cases} \\
-\end{eqnarray*}
-where $\alpha = (\alpha^1, \alpha^2)$, $\sigma = (\sigma_1, \sigma_2)$, and
-\[
-{\bf A} =
-\begin{cases}
-\left( \begin{matrix}(H_{tot}^1)^2 & \rho H_{tot}^1H_{tot}^2 \\ \rho
-H_{tot}^1H_{tot}^2 & (H_{tot}^2)^2\end{matrix} \right)(t-s) & \mbox{if
-$\alpha$ is constant in $[s,t]$} \\
-\left(\begin{matrix}
-(H_{tot}^1)^2\frac{e^{-2\kappa_1s}-e^{-2\kappa_1t}}{2\kappa_1} & \rho
-H_{tot}^1H_{tot}^2\frac{e^{-(\kappa_1+\kappa_2)s} -
-e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} \\ \rho
-H_{tot}^1H_{tot}^2 \frac{e^{-(\kappa_1+\kappa_2)s} -
-e^{-(\kappa_1+\kappa_2)t}}{\kappa_1+\kappa_2} &
-(H_{tot}^2)^2\frac{e^{-2\kappa_2s}-e^{-2\kappa_2t}}{2\kappa_2}
-\end{matrix} \right) & \mbox{if $\sigma$ is constant in $[s,t]$}
-\end{cases}
-\]
-
-Therefore, the calibration problem is reformulated to the following
-optimization problem:
-\begin{eqnarray}\label{formula_HW2F_calib_optimization}
-\boxed{
-\begin{cases}
-\arg_{\alpha_i}\min \sum_{j=1}^M \left\{\alpha_i\cdot {\bf
-A}^{ij}\alpha_i -\left[(\sigma_N^{ij})^2 t_{ex}^i- {\bf H}^{ij}_{tot}
-\cdot \zeta_{t^{i-1}_{ex}} {\bf
-H}^{ij}_{tot}\right]\right\}^2\omega^2_{ij}, \; (i=1,\cdots,N) &
-\mbox{if $\alpha$ is piecewise constant} \\
-\arg_{\sigma_i}\min \sum_{j=1}^M \left\{\sigma_i\cdot {\bf
-A}^{ij}\sigma_i -\left[(\sigma_N^{ij})^2 t_{ex}^i- {\bf H}^{ij}_{tot}
-\cdot \zeta_{t^{i-1}_{ex}} {\bf
-H}^{ij}_{tot}\right]\right\}^2\omega^2_{ij}, \; (i=1,\cdots,N) &
-\mbox{if $\sigma$ is piecewise constant}
-\end{cases}
-}
-\end{eqnarray}
-where for the $i$-th optimization problem to be solved, the first
-$(i-1)$ optimization problems must be already solved.
-
-\subsection{Calibration to CMS spread option}
-
-The calibration of two-factor LGM model to CMS spread option is based
-on a sequence of swaptions  and a sequence of CMS spread options.
-
-More precisely, for a given sequence of expiries $t_{ex}^0 < t_{ex}^1
-< \cdots < t_{ex}^N$ and corresponding sequence of swap maturities
-$T_1, T_2, \cdots, T_N$, formula (\ref{formula_HW2F_calib_normal_vol})
-gives
-\[
-(\sigma_N^i)^2 t_{ex}^i - {\bf H}_{tot}^i \cdot \zeta_{t_{ex}^{i-1}}
-{\bf H}_{tot}^i = {\bf H}_{tot}^i \cdot (\zeta_{t_{ex}^{i}} -
-\zeta_{t_{ex}^{i-1}}) {\bf H}_{tot}^i, \; i=1,\cdots, N,
-\]
-where $\sigma_N^i$ is the normal vol for the $t^i_{ex} \times T_i$
-swaption and ${\bf H}_{tot}^i$ is the quantity similar to the one in
-formula (\ref{formula_HW2F_calib_normal_vol}) corresponding to the
-$t_{ex}^i \times T^i$ swaption.
-
-Assuming $\zeta_{t_{ex}^1}$, $\cdots$, $\zeta_{t_{ex}^{i-1}}$ have
-been given, to find out $\zeta_{t_{ex}^i}$, we repeat what's done in
-ATM calibration and write ${\bf H}_{tot}^i \cdot (\zeta_{t_{ex}^{i-1}}
-- \zeta_{t_{ex}^i}) {\bf H}_{tot}^i$ as
-\[
-{\bf H}_{tot}^i \cdot (\zeta_{t_{ex}^{i}} - \zeta_{t_{ex}^{i-1}}) {\bf
-H}_{tot}^i = \begin{cases}
-\alpha \cdot {\bf A}_i \alpha & \mbox{if $\alpha$ is constant in
-$[t_{ex}^{i-1}, t_{ex}^i]$} \\
-\sigma \cdot {\bf A}_i \sigma & \mbox{if $\sigma$ is constant in
-$[t_{ex}^{i-1}, t_{ex}^i]$} \\
-\end{cases}
-\]
-We further parameterize ${\bf A}_i$ by finding $r_1$, $r_2$, $\phi_0$ such that
-\[
-\frac{{\bf A}_i}{(\sigma_N^i)^2t_{ex}^i - {\bf H}_{tot}^i \cdot
-\zeta_{t_{ex}^{i-1}}{\bf H}_{tot}^i} =
-\left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\ \sin\phi_0 &
-\cos\phi_0 \end{matrix} \right)
-\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
-\end{matrix} \right)
-\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
-\cos\phi_0 \end{matrix} \right)
-\]
-Then the first equation for $\zeta_{t_{ex}^i}$ is
-\[
-1 = \begin{cases}
-\alpha \cdot \left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\
-\sin\phi_0 & \cos\phi_0 \end{matrix} \right)
-\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
-\end{matrix} \right)
-\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
-\cos\phi_0 \end{matrix} \right) \alpha & \mbox{if $\alpha$ is constant
-in $[t_{ex}^{i-1}, t_{ex}^i]$} \\
-\sigma \cdot \left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\
-\sin\phi_0 & \cos\phi_0 \end{matrix} \right)
-\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
-\end{matrix} \right)
-\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
-\cos\phi_0 \end{matrix} \right) \sigma & \mbox{if $\sigma$ is constant
-in $[t_{ex}^{i-1}, t_{ex}^i]$} \\
-\end{cases}
-\]
-
-For the second equation, consider an ATM CMS spread option with payoff
-\[
-[S_1(t_{ex}^i)-S_2(t_{ex}^i)-K]^+
-\]
-at time $t^i_{ex}$, where $S_1$ and $S_2$ are two swap rates, and $K =
-E^{Q_{t_{ex}^i}}[S_1(t_{ex}^i)] - E^{Q_{t_{ex}^i}}[S_2(t_{ex}^i)]$.
-The normal vol of $S_1(t_{ex}^i)-S_2(t_{ex}^i)$ can be quoted directly
-from market, while Hagan's formula gives the normal spread vol as
-\[
-(\sigma_N^{sprd})^2 t_{ex}^i = ({\bf H}_{tot}^1 - {\bf H}_{tot}^2)
-\cdot \zeta_{t_{ex}^i} ({\bf H}_{tot}^1 - {\bf H}_{tot}^2),
-\]
-where ${\bf H}_{tot}^1$ corresponds to $S_1$ and ${\bf H}_{tot}^2$
-corresponds to $S_2$. Matching $\sigma_N^{sprd}$ with market quote
-will give us the second equation for $\zeta_{t^i_{ex}}$.
-
-\medskip
-
-These two equations combined allow us to solve for $\zeta_{t^i_{ex}}$.
-More precisely, we use $x = (x_1, x_2)^T$ to stand for either $\alpha$
-or $\sigma$. On the interval $[t_{ex}^{i-1}, t_{ex}^i]$ we have two
-equations for two unknowns:
-\begin{eqnarray}\label{eqn_alph1_alpha2}
-\begin{cases}
-1 = (x_1,x_2) \cdot \left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\
-\sin\phi_0 & \cos\phi_0 \end{matrix} \right)
-\left(\begin{matrix}\frac{1}{r_1^2} & 0 \\ 0 & \frac{1}{r_2^2}
-\end{matrix} \right)
-\left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\ -\sin\phi_0 &
-\cos\phi_0 \end{matrix} \right) \left(\begin{matrix} x_1 \\ x_2
-\end{matrix} \right) \\
-(\sigma_N^{mkt})^2 t^i_{ex} = ({\bf H}_{tot}^1 - {\bf H}_{tot}^2)
-\cdot \zeta_{t_{ex}^i} ({\bf H}_{tot}^1 - {\bf H}_{tot}^2)
-\end{cases}
-\end{eqnarray}
-where $\sigma_N^{mkt}$ is market quote of the normal spread vol and
-\begin{eqnarray}\label{formula_alpha2zeta}
-\zeta_{t^i_{ex}} = \zeta_{t^{i-1}_{ex}} + \left( \begin{matrix} x_1 &
-0 \\ 0 & x_2 \end{matrix}\right)  {\bf B} \left( \begin{matrix} x_1 &
-0 \\ 0 & x_2 \end{matrix}\right).
-\end{eqnarray}
-where
-\[
-{\bf B} =
-\begin{cases}
-\left( \begin{matrix}1 & \rho  \\ \rho & 1\end{matrix}
-\right)(t_{ex}^i-t_{ex}^{i-1}) & \mbox{if $\alpha$ is constant in
-$[t_{ex}^{i-1},t_{ex}^i]$} \\
-\left(\begin{matrix} \frac{e^{-2\kappa_1
-t_{ex}^{i-1}}-e^{-2\kappa_1t_{ex}^i}}{2\kappa_1} & \rho
-\frac{e^{-(\kappa_1+\kappa_2)t_{ex}^{i-1}} -
-e^{-(\kappa_1+\kappa_2)t_{ex}^i}}{\kappa_1+\kappa_2} \\ \rho
-\frac{e^{-(\kappa_1+\kappa_2)t_{ex}^{i-1}} -
-e^{-(\kappa_1+\kappa_2)t_{ex}^i}}{\kappa_1+\kappa_2} &
-\frac{e^{-2\kappa_2t_{ex}^{i-1}}-e^{-2\kappa_2t_{ex}^i}}{2\kappa_2}
-\end{matrix} \right) & \mbox{if $\sigma$ is constant in
-$[t_{ex}^{i-1},t_{ex}^i]$}
-\end{cases}
-\]
-
-We set the re-parametrization
-\[
-\begin{cases}
-x_1 = r\cos\phi \\
-x_2 = r\sin\phi
-\end{cases}
-\]
-such that the first equation of system (\ref{eqn_alph1_alpha2}) becomes
-$1 = \frac{r^2 \cos^2(\phi-\phi_0)}{r_1^2} +
-\frac{r^2\sin^2(\phi-\phi_0)}{r_2^2}$, or equivalently,
-\begin{eqnarray}\label{formula_phi2r}
-r = \frac{r_1r_2}{\sqrt{r_2^2\cos^2(\phi-\phi_0)+r_1^2\sin^2(\phi-\phi_0)}}.
-\end{eqnarray}
-This allows us to use the following trial-and-error procedure to solve
-system (\ref{eqn_alph1_alpha2}):
-\newline Step 1. try a testing value of $\phi$;
-\newline Step 2. use formula (\ref{formula_phi2r}) to obtain the value of $r$;
-\newline Step 3. obtain the values of $x_1$ and $x_2$ by those of $r$
-and $\phi$;
-\newline Step 4. obtain $\zeta_{t^i_{ex}}$ by formula
-(\ref{formula_alpha2zeta});
-\newline Step 5. use the RHS of the second equation of system
-(\ref{eqn_alph1_alpha2}) to obtain theoretical normal spread vol
-$\sigma_N^{sprd}$;
-\newline Step 6. check the error $|\sigma_N^{sprd} - \sigma_N^{mkt}|$:
-if sufficently small, stop; otherwise, return to Step 1 with a
-different value for $\phi$.
-
-The above procedure has the advantage of reducing problem's
-dimensionality. The cost is a complicated nonlinear equation of the
-unknown $\phi$, such that it becomes hard to analyze the effectiveness
-of global Newton's method:
-\[
-\frac{(\sigma_N^{mkt})^2 t_{ex}^i - ({\bf H}_{tot}^{1} - {\bf
-H}_{tot}^{2}) \cdot \zeta_{t_{ex}^{i-1}}({\bf H}_{tot}^{1} - {\bf
-H}_{tot}^{2})}{r_1^2 r_2^2} = \frac{({\bf H}_{tot}^{1} - {\bf
-H}_{tot}^{2}) \cdot \left(\begin{matrix} \cos\phi & 0 \\ 0 & \sin\phi
-\end{matrix} \right) {\bf B} \left(\begin{matrix} \cos\phi & 0 \\ 0 &
-\sin\phi \end{matrix} \right)({\bf H}_{tot}^{1} - {\bf
-H}_{tot}^{2})}{r_2^2\cos^2(\phi-\phi_0)+r_1^2\sin^2(\phi-\phi_0)}
-\]
-
-
-This equation can actually be simplified to give closed-form solution
-as follows. We define ${\bf h} = {\bf H}_{tot}^{1} - {\bf H}_{tot}^{2}
-= (h_1, h_2)^T$ and ${\bf Q} = \left(\begin{matrix} h_1 & 0 \\ 0 & h_2
-\end{matrix}\right) {\bf B} \left(\begin{matrix} h_1 & 0 \\ 0 & h_2
-\end{matrix}\right)$. Then the equation becomes
-\begin{eqnarray}\label{eqn_phi}
-\frac{(\sigma_N^{mkt})^2 t_{ex}^i - {\bf h} \cdot
-\zeta_{t_{ex}^{i-1}}{\bf h} }{r_1^2 r_2^2} =
-\frac{\left(\begin{matrix} \cos\phi & \sin\phi \end{matrix}\right){\bf
-Q} \left(\begin{matrix} \cos\phi \\ \sin\phi
-\end{matrix}\right)}{r_2^2\cos^2(\phi-\phi_0)+r_1^2\sin^2(\phi-\phi_0)}
-\end{eqnarray}
-
-To solve for $\phi$, we set $C=(\sigma_N^{mkt})^2 t_{ex}^i - {\bf h}
-\cdot \zeta_{t_{ex}^{i-1}}{\bf h}$, $\theta = \phi - \phi_0$, and
-\begin{eqnarray*}
-\hat {\bf Q} &=& \left(\begin{matrix}\cos\phi_0 & \sin\phi_0 \\
--\sin\phi_0 & \cos\phi_0 \end{matrix}\right) {\bf Q}
-\left(\begin{matrix}\cos\phi_0 & -\sin\phi_0 \\ \sin\phi_0 &
-\cos\phi_0 \end{matrix}\right) \\
-&=&
-\left(
-\begin{matrix}
-Q_{11}\cos^2\phi_0 + Q_{22} \sin^2\phi_0 + 2Q_{12}\sin\phi_0\cos\phi_0
-& (Q_{22}-Q_{11})\sin\phi_0\cos\phi_0 +
-Q_{12}(\cos^2\phi_0-\sin^2\phi_0)\\
-(Q_{22}-Q_{11})\sin\phi_0\cos\phi_0 +
-Q_{12}(\cos^2\phi_0-\sin^2\phi_0) & Q_{11}\sin^2\phi_0 +
-Q_{22}\cos^2\phi_0 - 2Q_{12}\sin\phi_0\cos\phi_0
-\end{matrix}
-\right)
-\end{eqnarray*}
-Then the equation (\ref{eqn_phi}) becomes
-\begin{eqnarray}\label{eqn_theta}
-\sin(2\theta + \gamma) = \frac{C(r_1^2+r_2^2)-r_1^2r_2^2(\hat Q_{11} +
-\hat Q_{22})}{\sqrt{[r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 -
-r_1^2)]^2+ 4r_1^4r_2^4\hat Q_{12}^2}}
-\end{eqnarray}
-where $\gamma$ is determined by
-\begin{eqnarray}\label{eqn_gamma}
-\begin{cases}
-\sin\gamma = \frac{r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 -
-r_1^2)}{\sqrt{[r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 -
-r_1^2)]^2+ 4r_1^4r_2^4\hat Q_{12}^2}} \\
-\cos\gamma = \frac{2r_1^2r_2^2\hat Q_{12}}{\sqrt{[r_1^2r_2^2(\hat
-Q_{11}-\hat Q_{22}) - C(r_2^2 - r_1^2)]^2+ 4r_1^4r_2^4\hat Q_{12}^2}}
-\end{cases}
-\end{eqnarray}
-A necessary and sufficient for equation (\ref{eqn_theta}) to have a solution is
-\[
-\left| C(r_1^2+r_2^2)-r_1^2r_2^2(\hat Q_{11} + \hat Q_{22}) \right|
-\le \sqrt{[r_1^2r_2^2(\hat Q_{11}-\hat Q_{22}) - C(r_2^2 - r_1^2)]^2+
-4r_1^4r_2^4\hat Q_{12}^2},
-\]
-which is equivalent to an inequality for a quadratic polynomial of
-$C$. Tedious calculation shows the inequality can be reduced to $C_-
-\le C \le C_+$, where
-\[
-C_{\pm} = \frac{r_1^2\hat Q_{11} + r_2^2 \hat Q_{22}}{2} \pm
-\frac{\sqrt{r_1^4\hat Q_{11}^2 + r_2^4\hat Q_{22}^2 + 4r_1^2r_2^2\hat
-Q_{12}^2}}{2}.
-\]
-Therefore, the necessary and sufficient condition for a successful
-calibration is
-\[
- - \frac{\sqrt{r_1^4\hat Q_{11}^2 + r_2^4\hat Q_{22}^2 +
-4r_1^2r_2^2\hat Q_{12}^2}}{2}\le (\sigma_N^{mkt})^2t_{ex}^i - \left[
-{\bf h} \cdot \zeta_{t^{i-1}_{ex}} {\bf h} + \frac{r_1^2\hat Q_{11} +
-r_2^2 \hat Q_{22}}{2} \right] \le  \frac{\sqrt{r_1^4\hat Q_{11}^2 +
-r_2^4\hat Q_{22}^2 + 4r_1^2r_2^2\hat Q_{12}^2}}{2}.
-\]
-
-\medskip
-
-Simultaneously, we have discovered the follow procedure to solve
-system (\ref{eqn_alph1_alpha2}) explicitly:
-\newline Step 1: obtain the value of $C = (\sigma_N^{mkt})^2t^i_{ex} -
-{\bf h} \cdot \zeta_{t^{i-1}_{ex}} {\bf h}$ by inserting the value of
-$\sigma_N^{mkt}$, and use it to compute the value of $\gamma$ by
-equation (\ref{eqn_gamma});
-\newline Step 2: invert equation (\ref{eqn_theta}) to obtain the value
-of $\theta$;
-\newline Step 3: use the value of $\theta$ to obtain the value of
-$\phi=\theta+\phi_0$ and compute the value of $r$ by formula
-(\ref{formula_phi2r});
-\newline Step 4: obtain the values of $x_1$ and $x_2$: $x_1 =
-r\cos\phi$, $x_2 = r\sin\phi$;
-\newline Step 5: obtain $\zeta_{t_{ex}^i}$ by formula
-(\ref{formula_alpha2zeta}).
-
-\begin{remark}
-From Step 2, we shall have two representative solutions of $\theta$,
-with the relation
-\[
-\theta^{(1)}+\theta^{(2)} \mod \pi = \frac{\pi}{2}.
-\]
-This leads to two representative solution pairs of $(r,\phi)$ with the relation
-\[
-\begin{cases}
-\phi^{(1)}+\phi^{(2)} \mod \pi = \frac{\pi}{2} \\
-r^{(1)} = \frac{r_1r_2}{\sqrt{r_2^2\cos^2\theta^{(1)} + r_1^2
-\sin^2\theta^{(1)}}} = \frac{r_1r_2}{\sqrt{r_2^2\sin^2\theta^{(2)} +
-r_1^2 \cos^2\theta^{(2)}}}\\
-r^{(2)} = \frac{r_1r_2}{\sqrt{r_2^2\cos^2\theta^{(2)} + r_1^2
-\sin^2\theta^{(2)}}} =
-\frac{r_1r_2}{\sqrt{r_2^2\sin^2\theta^{(1)} + r_1^2 \cos^2\theta^{(1)}}}\\
-\end{cases}
-\]
-\end{remark}
 
 
 \begin{appendix}
