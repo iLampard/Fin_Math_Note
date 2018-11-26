@@ -119,12 +119,14 @@
 
 \title{Note on Volatility Surface}
 \author{S.X}
-\date{Version 1.0, 2018-11-12.}
+\date{Version 1.1, 2018-11-26.}
 
 \maketitle
 
 \begin{abstract}
-The note documents methodologies of volatility surface modeling and calibrations.
+The note documents methodologies of volatility surface modeling. The contents are mainly extracted
+from lecture notes of Tankov\cite{Tankov} and Touzi\cite{Touzi} from \'Ecole Polytechnique and the book of Derman\cite{Derman}. 
+The credits go to these three authors.
 \end{abstract}
 
 \tableofcontents
@@ -159,14 +161,14 @@ to or withdrawn from the portfolio after the initial date.
 \end{definition}
 
 \begin{prop}
-    Let $V_t$ be the value of a self-financing portfolio at time $t$ which is consisted of stock and bonds. $\delta_t$ denotes the number of stck in the portfolio then
+    Let $V_t$ be the value of a self-financing portfolio at time $t$ which is consisted of stock and bonds. $\delta_t$ denotes the number of stocks in the portfolio then
     the dynamics of $V_t$ follows
     \[
         dV_t =  \prt{V_t - \de_t S_t}rdt + \de_tdS_t   
     \]
 \end{prop}
 \begin{proof}
-    $B_t$ denotes the value of bonds in the portfolio at time $t$. 
+    $B_t$ denotes the value of bonds in the portfolio at time $t$, then 
     \[
         V_t = \de_t S_t + B_t
     \]
@@ -190,7 +192,7 @@ to or withdrawn from the portfolio after the initial date.
 
 \end{proof}
 
-Suppose $V_t=C(t, S_t)$ where $C(t,S_t)$ is a regulized function. Then $dV_t=fC(t,S_t)$ and by It$\hat{o}$ lemma
+Suppose $V_t=C(t, S_t)$ where $C(t,S_t)$ is a regulized function. Then $dV_t=dC(t,S_t)$ and by It$\hat{o}$ lemma
 \begin{eqnarray*}
     d C(t,S_t) &=& \frac{\pa C}{\pa t} d t + \frac{\pa V}{\pa S} d S_t + \frac{\pa^2 V}{\pa S^2}<dS_t,dS_t>  \\
             &=&\s \frac{\pa C}{\pa S} d W_t + (\frac{\pa C}{\pa t} +\m S_t \frac{\pa C}{\pa S}+\frac{1}{2}\s^2 S_t^2\frac{\pa^2 C}{\pa S^2})dt 
@@ -199,7 +201,7 @@ Suppose $V_t=C(t, S_t)$ where $C(t,S_t)$ is a regulized function. Then $dV_t=fC(
 
 Because of $dV_t=dC(t,S_t)$ we necessarily have 
 \begin{eqnarray}
-    \d_t &=& \frac{\pa C(t,S_t)}{\pa S} \nonumber \\
+    \de_t &=& \frac{\pa C(t,S_t)}{\pa S} \nonumber \\
     rC(t,S) &=& \frac{\pa C}{\pa t} +rS\frac{\pa C}{\pa S} + \frac{1}{2} \s^2 S^2 \frac{\pa^2 C}{\pa S^2} \label{BS_PDE}
 \end{eqnarray}
 
@@ -266,10 +268,37 @@ is the discounted expected value of future payoff.
 
 
 \subsection{Implied volatility}
+\subsubsection{Option delta}
+Use $I$ to denote the implied volatility of option $C(t,S_t)$, by definition we can write
+\[
+    C(t,S_t) = C^{BS}(t, S_t, I)    
+\]
 
+If $I$ does not depend on $S_t$ but only on $K$(Derman calls this \emph{sticky strike}), then we have
+\[
+   \frac{\pa C(t,S_t)}{\pa S}  =  \frac{\pa C^{BS}(t,S_t)}{\pa S}    
+\]
+The option delta equals to delta from the Black-Scholes model. However in reality this rarely happens and we in fact
+must write
+\[
+    \frac{\pa C(t,S_t)}{\pa S}  =  \frac{\pa C^{BS}(t,S_t, I)}{\pa S}  + \frac{\pa C^{BS}(t,S_t,I)}{\pa I}\frac{\pa I}{\pa S} 
+\]
+
+To handle the second term in above equation, practitioners usually propose models of smile evolutions under certain 
+assumptions. For example, Derman proposed regimes of \emph{sticky delta} where $I$ depends on $K/S$ but not on them separately. In that
+case set $I=I(K/S)$ we have 
+\[
+    \frac{\pa C(t,S_t)}{\pa S}  =  \frac{\pa C^{BS}(t,S_t, I)}{\pa S} + \frac{\pa C^{BS}(t,S_t,I)}{\pa I} \frac{K}{S^2} \frac{\pa I^{'}}{\pa S} 
+\]
+
+For details please go to see Derman's book\cite{Derman}.
+
+
+
+\subsubsection{Compared with historical volatility}
 In the Black-Scholes model, the implied volatility of all options on the same
 underlying must be the same and equal to the historical volatility (standard
-deviation of annualized returns) of the underlying. However, when I is computed
+deviation of annualized returns) of the underlying. However, when it is computed
 from market-quoted option prices, one observes that
 \begin{itemize}
     \item The implied volatility is always greater than the historical volatility of the
@@ -279,6 +308,7 @@ from market-quoted option prices, one observes that
 \end{itemize}
 
 
+\newpage 
 \section{Delta hedging strategies}
 Realized volatility is the amount of noise in the stock price, it is the coefficient
 of the Wiener process in the stock returns model, it is the amount of randomness that actually transpires. Implied volatility is how the
@@ -509,6 +539,7 @@ then ‘deterministic’ as we shall see.
 \end{proof}
 
 
+\newpage 
 \section{Local volatility models}
 
 In section(\ref{sect_BS}) we see that the Black-Scholes model with constant volatility
@@ -596,7 +627,7 @@ Modelling local volatility by Dupire's formula is criticized for:
     (ill-posed problem).
 \end{itemize}
 
-Due to these two problems, in practice, Dupire's formula is not used directly
+Due to these problems, in practice, Dupire's formula is not used directly
 on the market prices. To avoid solving the ill-posed problem, practitioners
 typically use one of two approaches to calibrate the model:
 \begin{enumerate}
@@ -610,12 +641,15 @@ typically use one of two approaches to calibrate the model:
 \end{enumerate}
 
 
+
+\newpage
 \section{Stochastic volatility models}
 
-\begin{eqnarray*}
-    &&\frac{d S_t}{S_t} = \mu_t dt + \s_t dW_t   \\
+\begin{eqnarray}
+    &&\frac{d S_t}{S_t} = \mu_t dt + \s_t dW_t   \nonumber \\
     &&d \s_t = a_t dt + b_t d W^{'}_t, \quad d<W, W^{'}>=\rho dt
-\end{eqnarray*}
+    \label{stoch_vol_sde}
+\end{eqnarray}
 where $a_t=a(t, \s_t, S_t), b_t=b(t, \s_t, S_t)$, $\rho \in (-1, 1)$. Because there are two source of risks, two underlyings are desired for hedging the risks. 
 
 Assume there exists a liquid underlying with the price
@@ -701,6 +735,44 @@ $Q$.
 \end{proof}
 
 
+\subsection{The characteristic solution}
+First introduce the following theorem without proof.
+
+\begin{theorem}(Mixing Theorem, Romano and Touzi, 1997)
+    Let $C(S_0,V_0,T) $ be the call option price under
+    the risk-adjusted, stochastic volatility process (\ref{stoch_vol_sde}). Let $C^{BS}(S_0, V_0, T)$ be the Black-Scholes price given today's price $S_0$ and volaility $V_0$ of underlying. Define 
+    \begin{eqnarray*}
+        && S^e_T=S_0\exp \prt{-\frac{1}{2}\int^T_0 \rho_t^2 \s_t^2 dt + \int^T_0 \rho_t  \s_t d W_t } \\
+        && V^e_T=\frac{1}{T} \int_0^T (1-\rho^2) \s_t^2 dt \\
+        && \left< C^{BS}(S_T^e, V_T^e, T) \right> = \lim_{\Delta_t \rightarrow 0} \int^{\infty}_{-\infty} \int^{\infty}_{-\infty}...C^{BS}(S_T^e, V_T^e, T) \prod_{t=0}^{T-\Delta t} \exp(-\frac{1}{2} W^2_t )
+        \frac{dW_t}{(2\pi)^{0.5}}
+    \end{eqnarray*}
+\end{theorem}
+
+In words, the option value under stochastic volatility is a weighted sum or mixture of the
+Black-Scholes values with an effective stock price and effective volatility. The effective
+variables depend only upon the volatility process. Hence, the valuation reduces to a pricing
+expectation over the risk-adjusted volatility process alone. 
+
+\subsubsection{Zero correlation case}
+In general $<S^e_T, S^e_T> = S_0$, when $\rho=0$, then $S^e_T=S_0$. In this case, we introduce 
+\[
+    C(T,K) = \int_0^{\infty} C^{BS}(T, K, ) p(U_t) dU_T = \E [C^{BS}(T, K, V_T)]
+\]
+
+Suppose $V_T$ is close to $\E[V_T]$, i.e, $VarV_T << E[V_T^2]$, by Taylor expansion, we have
+\[
+    C(T,K) \approx C^{BS}(T, K, E[V_T]) + \frac{1}{2} VarV_T \frac{\pa^2}{\pa V^2} C^{BS}(T,K,E[V_T])   
+\]
+where
+\[
+    \frac{\pa^2}{\pa V^2} C^{BS}(T,K,E[V_T])  = \frac{SN(d_1)}{4V^{3/2}}\prt{ \frac{k^2}{V} - \frac{V}{4} -1 }, k=\log \frac{K}{Se^{rT}}   
+\]
+Besides, because $\de \s << \s$,
+\[
+    C^{BS}(T, K, \s+\de \s) \approx C^{BS}(T, K, \s) + \de \s \frac{\pa C^{BS}(T, K, \s)}{\pa \s}
+\]
+
 
 \subsection{Pricing formula of caplet and calibration to caps market}
 
@@ -727,83 +799,24 @@ Therefore, calibration to caplets in order to obtain $\zeta_{t_f}$ requires solv
 \]
 We note $\mbox{Bl}(K, F, v, 1)$ is a monotone increasing function of $v$ with a range of $((F-K)^+, F)$. So the above calibration equation always has a solution.
 
-\subsection{Interpolation of LGM model parameter $\zeta$}
-
-We assume there is a coupon period $[t_s, t_e]$ and we are given the values of $\zeta$ at $t_s$ and $t_e$:
-$\zeta_s$ and $\zeta_e$, respectively. If the volatility of one-factor Hull-White model (equivalent to one-factor
-LGM model) is a constant $\sigma$ over $[t_s, t_e]$, we have for $t\in [t_s, t_e]$
-\[
-\zeta_t =
-\begin{cases}
-\zeta_s + \sigma^2(t-t_s) & \mbox{if $\kappa=0$} \\
-\zeta_s + \sigma^2 \frac{e^{2\kappa t} - e^{2\kappa t_s}}{2\kappa} & \mbox{if $\kappa \ne 0$}
-\end{cases}
-\]
-
-By setting $t$ to $t_e$, we can solve for $\sigma$:
-\[
-\sigma =
-\begin{cases}
-\frac{\zeta_s(t_e-t)+\zeta_e(t-t_s)}{t_e-t_s} & \mbox{if $\kappa=0$} \\
-\frac{e^{2\kappa(t_e-t_s)} - e^{2\kappa(t-t_s)}}{e^{2\kappa(t_e-t_s)}-1}\zeta_s + \frac{e^{2\kappa(t-t_s)}-1}{e^{2\kappa(t_e-t_s)}-1}\zeta_e & \mbox{if $\kappa \ne 0$}
-\end{cases}
-\]
-
-\section{Elements of two-factor LGM model}\label{sect_LGM2F}
-
-\subsubsection{Approximate formula}
-
-Same as the one-factor case, the pricing formula of swaption can be written as
-\[
-V^{opt}_{rec}(0) = L_0 E^{Q_L}[(K^{adj}- S(t_{ex}))^+],
-\]
-where
-\[
-L(t) = \sum_{i=1}^n\tau_i P(t,t_i)
-\]
-($t\le t_0$, $i=1,\cdots, n$) is the annuity numeraire,
-$S(t)=\frac{P(t,t_0)-P(t,t_n)}{\sum_{i=1}^n\tau_iP(t,t_i)}$ is the
-forward swap rate, and $Q_L$ is the martingale measure associated with
-annuity numeraire. By the equivalent vol technique, we have (see Hagan
-\cite{Haganb}, formula(3.66a))
-\begin{eqnarray}\label{formula_HW2F_calib_normal_vol}
-\boxed{
-\sigma_N^2t_{ex} = {\bf H}_{tot} \cdot \zeta {\bf H}_{tot}
-}
-\end{eqnarray}
-where
-\[
-{\bf H}_{tot} = \frac{S(0)\sum_{i=1}^n \tau_i D_i \Delta {\bf H}_i +
-D_n\Delta {\bf H}_n}{\sum_{i=1}^n\tau_iD_i}
-\]
-and $\Delta {\bf H}_i = {\bf H}_i - {\bf H}_0$. This allows us to
-obtain the swaption price by Black's formula with normal vol $\sigma_N
-= \sqrt{\frac{{\bf H}_{tot}\cdot \zeta_{t_{ex}}{\bf
-H}_{tot}}{t_{ex}}}$:
-\begin{eqnarray}\label{formula_HW2F_swaption_approximate}
-\boxed{
-V_{rec}^{opt}(0) = L_0
-\left[(K^{adj}-S(0))\Phi(-d_1)+\frac{\sigma_N\sqrt{t_{ex}}}{\sqrt{2\pi}}e^{-d_1^2/2}\right]
-}
-\end{eqnarray}
-where $\Phi(\cdot)$ is the c.d.f. of standard normal distribution and
-$d_1 = \frac{S(0)-K^{adj}}{\sigma_N \sqrt{t_{ex}}}$.
-
-
 
 
 \begin{appendix}
 
 
 \end{appendix}
+\newpage
 
 \begin{thebibliography}{99}
 
-\bibitem{Derman} Emanuel Derman and Michael B.Miller. The volatility smile. {\it
-Weiley Financial Series}, 2016.
+\bibitem{Lewis} Alan Lewis. The mixing approach to stochastic volatility and jump models. {\it
+WilMott}, 2002.
 
 \bibitem{Wilmott} Riaz Ahmad and Paul Wilmott. Which free lunch would you like today, sir? delta hedging, volatility arbitrage and optimal portfolios. {\it
 WilMott}, 2005.
+    
+\bibitem{Derman} Emanuel Derman and Michael B.Miller. The volatility smile. {\it
+Weiley Financial Series}, 2016.
 
 \bibitem{Touzi} Nizar Touzi. Calcul Stochatique en Finance. {\it
 Lecture Note} {\bf}, PA Math\'ematiques Appliqu\'ees, Ecole Polytechnique, September, 2018.
