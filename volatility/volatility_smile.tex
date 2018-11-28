@@ -320,6 +320,7 @@ different. \footnote{This section is mainly extracted from Derman \cite{Derman} 
 
 We set up the problem in the following way
 \begin{enumerate}
+    \item Assume we are in the world of Black-Scholes model, where all its assumptions and valuation are valid.
     \item Assume the option
     is hedged at discrete points in time, $t_0, t_1,...t_n$, such that $t_i-t_{i-1}=\de t$ and
     with tn representing the expiration time of the option.
@@ -394,7 +395,10 @@ We now use $C(t,S_t; \s)$ to denote the Black-Scholes price with volatility $\s$
 
 
 \begin{proof}
-    For simplicity, we use $C^r = C(S_0,t_0;\s^r), C^i = C(S_0,t_0;\s^i)$
+    We set $C_t^r = C(t, S_t;\s^r), C_t^i = C(t, S;\s^i)$ and use $\Delta^r$ to denote the delta from BSM formula using realized volatility while $\Delta^i$
+    using the implied volatility. 
+    
+    For simplicity, we ignore the $t$ substitutes in this section.
 
     Initially we buy the option at its implied volatility and hedged at known realized volatility, the hedged portfolio
     at any time $t$ is given by
@@ -408,10 +412,10 @@ We now use $C(t,S_t; \s)$ to denote the Black-Scholes price with volatility $\s$
         \label{hedging_dynamic_real_vol}     
     \end{eqnarray}
     where the first term is the increase in the value of the long position in the option, the
-    second is the decrease in the value of the short position in the stock and the last term, $(C^i -\Delta^r S)rdt$, represents the interest on the cost
+    second is the decrease in the value of the short position in the stock and the last term, $(C_t^i -\Delta_t^r S_t)rdt$, represents the interest on the cost
     of borrowing an amount $(C^i -\Delta^r S)$ used to set up the initial hedge portfolio.
 
-    Besides if we value an option at $\s^i$ and hedged at $\s^i$, the hedging strategy becomes riskless one that leads to BSM equation, With the riskless
+    Besides if we value an option at $\s^r$ and hedged at $\s^r$, the hedging strategy becomes riskless one that leads to BSM equation, With the riskless
     hedging strategy, the increase in value of the hedge portfolio should be no different from the interest earned on the position at the riskless rate, meaning 
     \begin{eqnarray}
         0 = dC^r - \Delta^r dS - (C^r -\Delta^r S)rdt 
@@ -514,9 +518,9 @@ then ‘deterministic’ as we shall see.
 \end{theorem}
 
 \begin{proof}
-    Similar with previous proof, the instantaneous profit of the hedged position is
+    Similar with previous proof, the instantaneous profit of the hedged position at time $t$ is
     \begin{eqnarray}
-        d\pi_t &=& dC^i - \Delta^h dS - (C^i -\Delta^h S)rdt  \nonumber \\
+        d\pi &=& dC^i - \Delta^h dS - (C^i -\Delta^h S)rdt  \nonumber \\
         &=& \prt{dC^i - dC^h - r(C^i - C^h)dt} + \prt{dC^h - \Delta^h dS  - r(C^h-\Delta^h dS)dt}  
         \label{hedging_dynamic_const_vol_raw}
     \end{eqnarray}
@@ -528,12 +532,12 @@ then ‘deterministic’ as we shall see.
 
     From proofs in Theorem(\ref{theorem_hedging_imp_vol}) , the present value of second item in equation(\ref{hedging_dynamic_const_vol_raw}) arrives
     \[
-        \frac{1}{2}\prt{(\s^i)^2 - (\s^r)^2 }  \int_{t_0}^T e^{-r(t-t_0)}  S^2_t \Gamma^i dt  
+        \frac{1}{2} \prt{(\s^r)^2 - (\s^h)^2 }  \int_{t_0}^T e^{-r(t-t_0)}  S^2_t \Gamma^h dt  
     \]
     
     Therefore the present value of total P$\&$L is 
     \[
-        C(S_0,t_0;\s^h)-C(S_0,t_0;\s^i) + \int_{t_0}^T e^{-r(t-t_0)}((\s^r)^2-(\s^h)^2)\frac{S_t^2}{2}\frac{\pa^2 C}{\pa S^2}(S_t,t;\s^h) dt   
+        C(S_0,t_0;\s^h)-C(S_0,t_0;\s^i) + \frac{1}{2} \prt{(\s^r)^2-(\s^h)^2}\int_{t_0}^T e^{-r(t-t_0)}\frac{S_t^2}{2}\frac{\pa^2 C}{\pa S^2}(S_t,t;\s^h) dt   
     \]
 
 \end{proof}
@@ -613,6 +617,23 @@ with the initial condition $C(t_0, K) = (S_0 - K)^+$
  Please see section (10.3) in Touzi \cite{Touzi}. 
 \end{proof}
 
+The value of the Dupire equation is that it tells you how to find a unique
+local volatility function $\s(T, K)$ from the market prices of standard options.
+Given the $\s(T, K)$ for all $T$ and $K$, one can then construct an implied tree
+that incorporates these local volatilities to value exotic options and to hedge
+standard options. 
+
+This single, theoretically unique implied tree will value
+all standard options in agreement with their market prices, and consistently
+within a single model, rather than having to use an inconsistent BSM framework
+with different underlying volatilities for each standard option.
+
+The local volatility surface calculated from market prices can also be
+useful for volatility arbitrage trading. One can calculate future local volatilities
+implied from option prices and then decide if they seem reasonable. Butterfly and calendar spreads 
+positions can be built for arbitrage if these future volatilities seem unreasonably low or high.
+Please see Chapter 15 in Derman\cite{Derman} for a theoretical example.
+
 
 \subsubsection{Calibration of local volatility models}
 Modelling local volatility by Dupire's formula is criticized for: 
@@ -644,7 +665,17 @@ typically use one of two approaches to calibrate the model:
 
 \newpage
 \section{Stochastic volatility models}
+The local volatility model covered in previous chapters can be viewed as
+a special case of a stochastic volatility model. The local volatility of a stock
+varies with the stock price, and the stock price is itself stochastic. In local
+volatility models, therefore, volatility is stochastic, but only because it is a
+function of the stochastic stock price, with which it is 100$\%$ correlated. 
 
+In the real world, implied and realized volatility tend to be correlated with the
+underlying stock price or index level, but the correlation is not 100$\%$.
+
+In this section we introduce an instantaneous correlation between the underlying price 
+and volaility: 
 \begin{eqnarray}
     &&\frac{d S_t}{S_t} = \mu_t dt + \s_t dW_t   \nonumber \\
     &&d \s_t = a_t dt + b_t d W^{'}_t, \quad d<W, W^{'}>=\rho dt
@@ -670,23 +701,24 @@ where
     {\cal{L}}_t = \frac{\pa}{\pa t} + \frac{1}{2} S_t^2 \s_t^2 \frac{\pa^2}{\pa S^2} + \frac{1}{2} b_t^2 \s_t^2 \frac{\pa^2}{\pa \s^2} + S_t\s_t b_t\rho \frac{\pa^2}{\pa S \pa \s}
 \]
 
-Suppose this self-financing portfolio replicates a deterministic payoff function $C: V_t =C(t, \s_t, S_t)$. By I't$\hat{o}$ lemma, it is obtained that
+Suppose this self-financing portfolio replicates a deterministic payoff function $C: V_t =C(t, \s_t, S_t)$. By It$\hat{o}$ lemma, it is obtained that
 \[
-    dV_t = {\cal{L}}_tC dt = {\cal{L}}_t C dt + \frac{\pa C}{ \pa S}dS_t + \frac{\pa C}{ \pa \s}d\s_t 
+    dV_t = {\cal{L}}_t C dt + \frac{\pa C}{ \pa S}dS_t + \frac{\pa C}{ \pa \s}d\s_t 
 \]
 
 To equalize the above dynamics and equation(\ref{sto_vol_self_financing}), we arrive 
 \begin{eqnarray*}
     && \om_t = \frac{\pa C / \pa \s}{\pa C^0 / \pa \s}   \\
     && \s_t = \frac{\pa C}{\pa S} - \om_t \frac{\pa C^0}{\pa S}\\
-    && {\cal{L}}_tC - rC + rS_t \frac{\pa C}{\pa S} = \frac{\pa C}{\pa \s}  \frac{{\cal{L}}_t C^0 - rC^0 + rS_t \frac{\pa C^0}{\pa S}}{\pa C^0 / \pa \s}
+    && {\cal{L}}_tC - rC_t + rS_t \frac{\pa C}{\pa S} = \frac{\pa C}{\pa \s}  \frac{{\cal{L}}_t C^0 - rC^0 + rS_t \frac{\pa C^0}{\pa S}}{\pa C^0 / \pa \s}
 \end{eqnarray*}
 
 Set $\lambda = - \frac{{\cal{L}}_t C^0 - rC^0 + rS_t \frac{\pa C^0}{\pa S}}{\pa C^0 / \pa \s}$, note that $\lambda$ does not depend on values of option that we are going to hedge, but 
 only on values of the stock that has been chosen initially. By replication we arrive at the equation that the price of the option with payoff $h(S_T)$ satisfies
-\[
-    {\cal{L}}_tC - rC + rS_t \frac{\pa C}{\pa S} + \lambda(t, \s, S) \frac{\pa C}{\pa \s}= 0, \quad C(T, \s, S) = h(S)    
-\] 
+\begin{eqnarray}
+    {\cal{L}}_tC - rC_t + rS_t \frac{\pa C}{\pa S} + \lambda(t, \s, S) \frac{\pa C}{\pa \s}= 0, \quad C(T, \s, S) = h(S)    
+    \label{stoch_vol_bs_sde}
+\end{eqnarray} 
 where 
 \[
     {\cal{L}}_t = \frac{\pa}{\pa t} + \frac{1}{2} S_t^2 \s_t^2 \frac{\pa^2}{\pa S^2} + \frac{1}{2} b_t^2 \s_t^2 \frac{\pa^2}{\pa \s^2} + S_t\s_t b_t\rho \frac{\pa^2}{\pa S \pa \s}   
@@ -694,6 +726,36 @@ where
 
 This is the generalization of the Black-Scholes equation with stochastic volatility. The hedging strategy with two types of underlyings whose hedging ratio satisfying $\om_t = \frac{\pa C / \pa \s}{\pa C^0 / \pa \s}$ and 
 $\s_t = \frac{\pa C}{\pa S} - \om_t \frac{\pa C^0}{\pa S}$ is called delta-vega hedging(risk of vega is risk of volatility).
+
+
+\subsection{Risk-neutral valuation} 
+By It$\hat{o}$ lemma, we find $C_t$ satisfies
+\[
+    dC_t = {\cal{L}}_t C dt + \frac{\pa C}{ \pa S}dS_t + \frac{\pa C}{ \pa \s}d\s_t   
+\]
+
+From equation(\ref{stoch_vol_bs_sde}) we see
+\[
+    {\cal{L}}_t C =  rC_t - rS_t \frac{\pa C}{\pa S} - \lambda(t, \s, S) \frac{\pa C}{\pa \s}
+\]
+
+Obviously by replacement of ${\cal{L}}_t C$ we have obtained
+\[
+    dC_t = rC_t+   \frac{\pa C}{\pa S} \prt{dS_t - rS_t dt} + \frac{\pa C}{\pa \s} \prt{ds_t - \lambda_t dt}
+\]
+
+Therefore in risk neutral measure we can write
+\begin{eqnarray*}
+    && \frac{dS_t}{S_t} = rdt + \s_t d \tilde{W}_t \\
+    && d\s_t = \lambda_t dt + b_t  d \tilde{W^{'}}_t
+\end{eqnarray*} 
+where $\tilde{W}_t, \tilde{W^{'}}_t$ are two Brownian Motion under risk neutral measure $Q$ 
+with $d<\tilde{W}, \tilde{W^{'}}>=\rho dt$.
+
+Under $Q$, the price of European option satisfies
+\[
+    C(t, \s, S)  = \E^Q [e^{-r(T-t)} h(S_T) \vert  \s_t=\s, S_t=S ]    
+\]
 
 
 \subsection{Symmetric principle of implied volatility}
@@ -774,30 +836,16 @@ Besides, because $\de \s << \s$,
 \]
 
 
-\subsection{Pricing formula of caplet and calibration to caps market}
 
-Consider the Libor rate for time period $[T_s, T_e]$, which is fixed at time $t_f \le T_s$. The market quotes give Black volatilities of caplets for various strikes. Suppose a caplet has strike $K$ and the year fraction of $[T_s, T_e]$ is $\tau$. The market price for this caplet is
-\[
-V_0^{mkt} = P(0,T_e)\tau \mbox{Bl}(K, F, \sigma_B\sqrt{t_f}, 1)
-\]
-where $F=F(0;T_s, T_e)$ is the forward rate for $[T_s, T_e]$ at time $0$, $\sigma_B$ is the market quoted Black vol, and $\mbox{Bl}(K,F,v,w)$ is given by
-\[
-\mbox{Bl}(K,F,v,w)=Fw\Phi(wd_1) - Kw\Phi(wd_2), \; d_1 = \frac{\ln(F/K)+v^2/2}{v}, \; d_2 = \frac{\ln(F/K)-v^2/2}{v}
-\]
+%where $H(t) = \int_0^t e^{-\kappa s}ds$ and $\zeta_t = \int_0^t e^{2\kappa s}\sigma_s^2 ds$ ($\sigma_{\cdot}$ is the volatility parameter in the corresponding one-factor Hull-White model).
 
-The theoretical price of the above caplet based on one-factor LGM model is
-\[
-V_0^{model} = P(0,T_e)\tau \mbox{Bl}\left(K+\frac{1}{\tau}, F+\frac{1}{\tau}, \left[H(T_e)-H(T_s)\right] \sqrt{\zeta_{t_f}}, 1\right)
-\]
-where $H(t) = \int_0^t e^{-\kappa s}ds$ and $\zeta_t = \int_0^t e^{2\kappa s}\sigma_s^2 ds$ ($\sigma_{\cdot}$ is the volatility parameter in the corresponding one-factor Hull-White model).
-
-Therefore, calibration to caplets in order to obtain $\zeta_{t_f}$ requires solving the following equation
-\[
-\boxed{
-\mbox{Bl}(K, F, \sigma_B\sqrt{t_f}, 1) = \mbox{Bl}\left(K+\frac{1}{\tau}, F+\frac{1}{\tau}, \left[H(T_e)-H(T_s)\right] \sqrt{\zeta_{t_f}}, 1\right)
-}
-\]
-We note $\mbox{Bl}(K, F, v, 1)$ is a monotone increasing function of $v$ with a range of $((F-K)^+, F)$. So the above calibration equation always has a solution.
+%Therefore, calibration to caplets in order to obtain $\zeta_{t_f}$ requires solving the following equation
+%\[
+%%\boxed{
+%\mbox{Bl}(K, F, \sigma_B\sqrt{t_f}, 1) = \mbox{Bl}\left(K+\frac{1}{\tau}, F+\frac{1}{\tau}, \left[H(T_e)-H(T_s)\right] \sqrt{\zeta_{t_f}}, 1\right)
+%}
+%\]
+%We note $\mbox{Bl}(K, F, v, 1)$ is a monotone increasing function of $v$ with a range of $((F-K)^+, F)$. So the above calibration equation always has a solution.
 
 
 
@@ -810,10 +858,10 @@ We note $\mbox{Bl}(K, F, v, 1)$ is a monotone increasing function of $v$ with a 
 \begin{thebibliography}{99}
 
 \bibitem{Lewis} Alan Lewis. The mixing approach to stochastic volatility and jump models. {\it
-WilMott}, 2002.
+Wilmott}, 2002.
 
 \bibitem{Wilmott} Riaz Ahmad and Paul Wilmott. Which free lunch would you like today, sir? delta hedging, volatility arbitrage and optimal portfolios. {\it
-WilMott}, 2005.
+Wilmott}, 2005.
     
 \bibitem{Derman} Emanuel Derman and Michael B.Miller. The volatility smile. {\it
 Weiley Financial Series}, 2016.
