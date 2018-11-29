@@ -797,18 +797,26 @@ $Q$.
 \end{proof}
 
 
+TODO: add stoch vol case.
+
 \subsection{The characteristic solution}
 First introduce the following theorem without proof.
 
 \begin{theorem}(Mixing Theorem, Romano and Touzi, 1997)
-    Let $C(S_0,V_0,T) $ be the call option price under
-    the risk-adjusted, stochastic volatility process (\ref{stoch_vol_sde}). Let $C^{BS}(S_0, V_0, T)$ be the Black-Scholes price given today's price $S_0$ and volaility $V_0$ of underlying. Define 
+    Let $C(S_0,T, \s_0) $ be the call option price under
+    the risk-adjusted, stochastic volatility process (\ref{stoch_vol_sde}) given today's price $S_0$ and volatility $\s_0$ of underlying. 
+    Let $C^{BS}(S_0, T, \s_0)$ be the Black-Scholes price. Define 
     \begin{eqnarray*}
         && S^e_T=S_0\exp \prt{-\frac{1}{2}\int^T_0 \rho_t^2 \s_t^2 dt + \int^T_0 \rho_t  \s_t d W_t } \\
         && V^e_T=\frac{1}{T} \int_0^T (1-\rho^2) \s_t^2 dt \\
-        && \left< C^{BS}(S_T^e, V_T^e, T) \right> = \lim_{\Delta_t \rightarrow 0} \int^{\infty}_{-\infty} \int^{\infty}_{-\infty}...C^{BS}(S_T^e, V_T^e, T) \prod_{t=0}^{T-\Delta t} \exp(-\frac{1}{2} W^2_t )
-        \frac{dW_t}{(2\pi)^{0.5}}
+        && \left< C(S_T^e, T, \sqrt{V_T^e}) \right> = \lim_{\Delta_t \rightarrow 0} \int^{\infty}_{-\infty} \int^{\infty}_{-\infty}...C^{BS}(S_T^e, T, \sqrt{V_T^e}) \prod_{t=0}^{T-\Delta t} \exp(-\frac{1}{2} {W^{'}}^2_t )
+        \frac{d W^{'}_t}{(2\pi)^{0.5}}
     \end{eqnarray*}
+    then the call option price satisfies
+    \[
+        C(S_0,T, \s_0) = \left< C(S_T^e, T, \sqrt{V_T^e}) \right>
+    \]
+
 \end{theorem}
 
 In words, the option value under stochastic volatility is a weighted sum or mixture of the
@@ -817,24 +825,51 @@ variables depend only upon the volatility process. Hence, the valuation reduces 
 expectation over the risk-adjusted volatility process alone. 
 
 \subsubsection{Zero correlation case}
-In general $<S^e_T, S^e_T> = S_0$, when $\rho=0$, then $S^e_T=S_0$. In this case, we introduce 
+In general $<S^e_T, S^e_T> = S_0$, when $\rho=0$, then $S^e_T=S_0$. 
+
+Define the integrated variance $V_T = \int_0^T \s^2_t dt$. In fact $\frac{V_T}{T} = \frac{1}{T}\int_0^T \s^2_t dt$ can be 
+seen as the average variance along a path.
+
+We introduce the density 
+function $p(\s_t)$ of $\s_t$. From mixing theorem we have
 \[
-    C(T,K) = \int_0^{\infty} C^{BS}(T, K, ) p(U_t) dU_T = \E [C^{BS}(T, K, V_T)]
+    C(T,K) = \int_0^{\infty} C^{BS}(T, K, \sqrt{V_T/T}) p(\s_t) d \s_t = \E [C^{BS}(T, K, \sqrt{V_T/T})]
+\]
+Hull and White(1987) established this result which will not derived in detail here. 
+
+Set $\overline{C}^BS(T,K,V_T) :=C^{BS}(T, K, \sqrt{V_T/T})$, we can rewrite
+\[
+    C(T,K) =  \E [\overline{C}(T,K,V_T)]  
 \]
 
-Suppose $V_T$ is close to $\E[V_T]$, i.e, $VarV_T << E[V_T^2]$, by Taylor expansion, we have
+Suppose $V_T$ is close to $\E[V_T]$, i.e, $VarV_T \ll E[V_T^2]$. 
+By expanding $\overline{C}^{BS}(T,K,V_T)$ at $V_T=E[V_T]$ we have 
 \[
-    C(T,K) \approx C^{BS}(T, K, E[V_T]) + \frac{1}{2} VarV_T \frac{\pa^2}{\pa V^2} C^{BS}(T,K,E[V_T])   
+    C(T,K) \approx \overline{C}^{BS}(T, K, E[V_T]) + \frac{1}{2} VarV_T \frac{\pa^2}{\pa V^2} \overline{C}^{BS}(T,K,E[V_T])   
 \]
 where
 \[
-    \frac{\pa^2}{\pa V^2} C^{BS}(T,K,E[V_T])  = \frac{SN(d_1)}{4V^{3/2}}\prt{ \frac{k^2}{V} - \frac{V}{4} -1 }, k=\log \frac{K}{Se^{rT}}   
+    \frac{\pa^2}{\pa V^2} \overline{C}^{BS}(T,K,E[V_T])  = \frac{SN(d_1)}{4V^{3/2}}\prt{ \frac{k^2}{V} - \frac{V}{4} -1 }, k=\log \frac{K}{Se^{rT}}   
 \]
-Besides, because $\de \s << \s$,
+Besides, when $\de \s \ll \s$,
 \[
     C^{BS}(T, K, \s+\de \s) \approx C^{BS}(T, K, \s) + \de \s \frac{\pa C^{BS}(T, K, \s)}{\pa \s}
 \]
+then set $\s=\sqrt{E[V_T/ T]}, \de \s = I(T,K) - \sqrt{E[V_T/ T]}$
+\begin{eqnarray*}
+    C^{BS}(T, K, I(T,K)) && \approx C^{BS}(T, K, \sqrt{E[V_T/ T]}) + \prt{I(T,K) - \sqrt{E[V_T/ T]}} \frac{\pa C^{BS}(T, K, \sqrt{E[V_T/ T]})}{\pa \s} \\
+    && = \overline{C}^{BS}(T,K,E[V_T]) + \prt{I(T,K) - \sqrt{E[V_T/ T]}} \frac{\pa C^{BS}(T, K, \sqrt{E[V_T/ T]})}{\pa \s}
+\end{eqnarray*}
 
+Assuming $C(T,K) = C^{BS}(T, K, I(T,K))$, then it can be easily obtained that 
+\begin{eqnarray}
+    &&\frac{1}{2} VarV_T \frac{\pa^2}{\pa V^2} \overline{C}^{BS}(T,K,E[V_T])  = \prt{I(T,K) - \sqrt{E[V_T/ T]}} \frac{\pa C^{BS}(T, K, \sqrt{E[V_T/ T]})}{\pa \s} \nonumber \\
+    &\Rightarrow& I(T,K) = \sqrt{E[V_T/ T]} + \frac{1}{2}  VarV_T \frac{\frac{\pa^2}{\pa V^2} \overline{C}^{BS}(T,K,E[V_T]) }{\frac{\pa C^{BS}(T, K, \sqrt{E[V_T/ T]})}{\pa \s}} \nonumber \\
+    &\Rightarrow& I(T,K) = \sqrt{E[V_T/ T]} + \frac{1}{8T^{1/2}E[V_T]^{3/2}}  VarV_T \prt{ \frac{k^2}{E[V_T]} - \frac{E[V_T]}{4} -1 }
+    \label{stoch_imp_vol_sym}
+\end{eqnarray}
+
+Equation(\ref{stoch_imp_vol_sym}) shows a symmetric form of smile in log-moneyness $k$.
 
 
 %where $H(t) = \int_0^t e^{-\kappa s}ds$ and $\zeta_t = \int_0^t e^{2\kappa s}\sigma_s^2 ds$ ($\sigma_{\cdot}$ is the volatility parameter in the corresponding one-factor Hull-White model).
