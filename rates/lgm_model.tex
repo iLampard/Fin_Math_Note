@@ -1,0 +1,444 @@
+% LaTeX template, xeCJK usepackage and Unicode text need XeLaTeX to compile.
+% MiKTeX package can be downloaded at miktex.org, WinEdt can be downloaded at http://www.winedt.com/.
+% WinEdt 6 and higher provide XeLaTeX and Unicode support.
+
+% LaTeX template version 1.0.4, last revised on 2014-11-17.
+
+\documentclass[10pt]{article}
+
+
+
+% *************************** installed packages *************************
+% AMS packages
+\usepackage{amsfonts}   % TeX fonts from the American Mathematical Society.
+\usepackage{amsmath}    % AMS mathematical facilities for LaTeX.
+\usepackage{amssymb}    % AMS symbols
+\usepackage{amsthm}     % Provide proclamations environment.
+
+% graphics packages
+\usepackage{graphics}   % Standard LaTeX graphics.
+\usepackage{tikz}       % TikZ and PGF package for graphics
+\usetikzlibrary{matrix} % matrix library of TikZ package
+\usetikzlibrary{trees}  % trees library of TikZ package
+
+% support for foreign languages, esp. Chinese.
+\usepackage{xeCJK}      % Support for CJK (Chinese, Japanese, Korean) documents in XeLaTeX.
+\setCJKmainfont{SimSun} % MUST appear when xeCJK is loaded.
+%\setCJKmainfont{DFKai-SB}          % 设置正文罗马族的CKJ字体，影响 \rmfamily 和 \textrm 的字体。此处设为“标楷体”。
+%\setCJKmainfont{SimSun}            % 设置正文罗马族的CKJ字体，影响 \rmfamily 和 \textrm 的字体。此处设为“宋体”。
+%\setCJKmonofont{MingLiU}           % 设置正文等宽族的CJK字体，影响 \ttfamily 和 \texttt 的字体。此处设为“细明体”。
+%\renewcommand\abstractname{摘要}   % 重定义摘要名：abstract->摘要。
+%\renewcommand\appendixname{附录}   % 重定义附录名：appendix->附录。
+%\renewcommand\bibname{参考文献}    % 重定义参考文献名：bibliography->参考文献。
+%\renewcommand\contentsname{目录}   % 重定义目录名：contents->目录。
+%\renewcommand\refname{参考文献}    % 重定义参考文献名：references->参考文献。
+
+% miscellaneous packages
+\usepackage[toc, page]{appendix}   % Extra control of appendices.
+\usepackage{caption}    % Customising captions in floating environments.
+%\captionsetup[figure]{labelformat=empty} % redefines the caption setup of the figures environment in the beamer %class.
+\usepackage{clrscode}   % Typesets pseudocode as in Introduction to Algorithms.
+\usepackage{epsfig}
+\usepackage{eurosym}    % Metafont and macros for Euro sign.
+\usepackage{float}      % Improved interface for floating objects.
+\usepackage{fontspec}   % Advanced font selection in XeLaTeX and LuaLaTeX.
+\usepackage{indentfirst}% Leave no indent for a paragraph after a sectional heading.
+\usepackage{xcolor}     % Driver-independent color extensions for LaTeX and pdfLaTeX.
+
+% must-be-the-last packages
+\usepackage[driverfallback=hypertex, pagebackref]{hyperref}   % Extensive support for hypertext in LaTeX; MUST be on the last \usepackage line in the preamble. [pagebackref] for page referencing; [backref] for section referencing.
+% ********************** end of installed packages ***********************
+
+
+
+% ************************** fullpage.sty ********************************
+% This is FULLPAGE.STY by H.Partl, Version 2 as of 15 Dec 1988.
+% Document Style Option to fill the paper just like Plain TeX.
+\typeout{Style Option FULLPAGE Version 2 as of 15 Dec 1988}
+
+\topmargin 0pt \advance \topmargin by -\headheight \advance
+\topmargin by -\headsep
+
+\textheight 8.9in
+
+\oddsidemargin 0pt \evensidemargin \oddsidemargin \marginparwidth
+0.5in
+
+\textwidth 6.5in
+% For users of A4 paper: The above values are suited for American 8.5x11in
+% paper. If your output driver performs a conversion for A4 paper, keep
+% those values. If your output driver conforms to the TeX standard (1in/1in),
+% then you should add the following commands to center the text on A4 paper:
+
+% \advance\hoffset by -3mm  % A4 is narrower.
+% \advance\voffset by  8mm  % A4 is taller.
+% ************************ end of fullpage.sty ***************************
+
+
+
+% ************** Proclamations (theorem-like structures) *****************
+% [section] option provides numbering within a section.
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+% ************************************************************************
+
+
+
+% ************* Solutions use a modified proof environment ***************
+%\newenvironment{solution}
+%  {\begin{proof}[Solution]}
+%  {\end{proof}}
+% ************************************************************************
+
+
+
+% ************* Frequently used commands as shorthand ********************
+\newcommand{\norm}{|\!|}
+
+
+\newcommand{\s}{\sigma}
+\newcommand{\om}{\omega}
+\newcommand{\prt}[1]{\left( #1 \right)}  % parenthese
+\newcommand{\de}{\delta}
+\newcommand{\pa}{\partial}
+\newcommand{\E}{\mathbb{E}}
+
+% ************************************************************************
+
+
+
+\begin{document}
+
+\title{Note on LGM Model}
+\author{X}
+\date{Version 1.1, 2018-12-07.}
+
+\maketitle
+
+\begin{abstract}
+The note documents methodologies of Linear Gaussian Markov model and its applications in 
+fixed income product modeling.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{HJM framework}
+After Ho and Lee (1986) introduced a discrete setting to model the evolution
+of the entire yield curve, Heath, Jarrow and Morton (HJM) (1992) developed a
+continuous framework for the modeling of interest rate dynamics(see for
+instances in \cite{Mercurio}). Precisely they choose the instantaneous
+forward rates, that can be locked in at one time for borrowing at a later
+time, as the fundamental quantities to model. HJM model is an arbitrage free
+framework for the stochastic evolution of the entire yield curve, where the
+forward rates dynamics are fully specified through their instantaneous
+volatility structures.
+
+\subsection{Forward rates}
+
+Denote $B(t,T)$ as the price at time $t$ of a \emph{zero coupon} bond
+maturing at time $T$ and have face value $1$. We assume this bond bears no
+risk of default and for every $t$ and $T$, the bond price $B(t,T)$ is
+defined.
+
+One can set up a zero cost portfolio, by taking a short position of size 1
+in a $T$ maturity bonds and a long position of size $\frac{B(t,T)}{B(t,T +
+\delta)}$ in $T + \delta$ maturity bonds. At time $T$ one is required to pay
+$1$ to cover the short position and at $T + \delta$ one receives $\frac{%
+B(t,T)}{B(t,T + \delta)}$, which is strictly larger than 1.
+
+It can be seen that the yield for the time $[T, T + \delta]$ is determined,
+or "locked in", at earlier time $t$. By this meaning, one defines the
+instantaneous \emph{forward rate} at time $t$ for investing at time T to be
+\[
+    f(t,T)=-\underset{\delta \rightarrow 0}{\lim }\frac{\log B(t,T+\delta )-\log
+B(t,T)}{\delta }    
+\]
+
+
+More precisely the forward rate is given by
+\begin{eqnarray}
+f(t,T)=-\frac{\partial }{\partial T}\log B(t,T)  
+\label{fwd_def}
+\end{eqnarray}
+
+If $f(t,T)$ is known for all values of $t<T$, one can recover $B(0,T)$ by
+equation (\ref{fwd_def}) that
+\begin{eqnarray}
+    B(t,T) = \exp{\left(-\int_{t}^T f(t,u) du \right)}  \label{zc_def}
+\end{eqnarray}
+
+Theoretically it does not matter whether to build a model for forward rates
+or for bond prices because of equations (\ref{fwd_def}) and (\ref{zc_def}).
+In practice forward rates are not easy to directly determine from market
+data as it is sensitive to small changes in bond prices.
+
+At last if letting $T=t$ the interest rate at time $t$ is given by
+\begin{eqnarray}
+r_{t} = f(t,t)  
+\label{r_t_def}
+\end{eqnarray}
+This rate is the instantaneous rate we can lock in at time $t$ for borrowing
+at time $t$. It is called spot rate or short rate in practise.
+
+
+\subsection{Dynamics of forward rates and bond prices}
+
+In the HJM model, forward rates is modeled under the form
+\begin{eqnarray}
+f(t,T)=f(0,T) + \int_{0}^{t}\gamma(s,T) ds + \int_{0}^{t}\sigma^f(s,T) d
+\hat{W}_{s}  \label{HJM_f_def}
+\end{eqnarray}
+where $\hat{W}_{s}$ is the Brownian motion under the historical probability
+measure $P$.
+
+Indeed HJM framework only admits no arbitrage under certain condition where is addressed in
+the following theorem.
+
+\begin{theorem}
+    \emph{\textbf{(HJM non-arbitrage condition)}} A HJM model
+    admits no arbitrage if there exists an adapted process $\theta_{t}$ which
+    satisfies
+    \[
+        \gamma(t,T) = \sigma^f(t,T)\left( \theta_{t} -  \sigma^B(t,T) \right)
+    \]
+    where $\gamma(t,T)$, $\sigma^f(t,T)$ are the drift and volatility of the
+    forward rate under the historical measure and
+    \[
+        \sigma^B(t,T)= - \int_{t}^T\sigma^f(t,u)\ du
+    \]
+    \label{thm_hjm_noarb}
+\end{theorem}
+
+
+
+By applying theorem {\textbf{\ref{thm_hjm_noarb}} and equation (\ref{HJM_f_def}) the dynamics under
+the risk neutral measure is given by
+\[
+    d f(t,T)= - \sigma^f(t,T)\sigma^B(t,T) dt + \sigma^f(t,T) dW_{t}  
+\]
+
+where $W_{t}$ is the Brownian motion under the risk neutral measure $Q$. }
+
+Indeed zero coupon is a tradable asset and under risk neutral measure its
+drift must be $r_{t}$. It can be shown by using Ito lemma and equation (\ref%
+{zc_def}) that
+\[
+    \frac{d B(t,T)}{ B(t,T)}= r_{t} dt + \sigma^B(t,T) dW_{t}
+\]
+
+The following theorem summarizes the discussion.
+\begin{theorem}
+    In a term-structure model satisfying the HJM no-arbitrage condition stated in theorem(\ref{thm_hjm_noarb}),
+    the forward rates evolve according to 
+    \begin{eqnarray}
+        d f(t,T)= - \sigma^f(t,T)\sigma^B(t,T) dt + \sigma^f(t,T) dW_{t}
+    \label{hjm_fwd_def}
+    \end{eqnarray}
+    and the zero coupon bond prices evolves as 
+    \begin{eqnarray}
+        \frac{d B(t,T)}{ B(t,T)}= r_{t} dt + \sigma^B(t,T) dW_{t}
+    \label{hjm_bond_def}
+    \end{eqnarray}
+    where $W_t$ is a Brownian motion under a risk-neutral measure $Q$。 Here $\sigma^B(t,T)=-\int_t^T \sigma^f(t,u) du$
+    and $r_t = f(t,t)$ is the interest rate. The discounted bond prices satisfy 
+    \[
+        d \prt{D(0,t) B(t,T)} = D(0,t)\sigma^B(t,T) B(t,T) d W_t    
+    \]
+    where $D(0,t) = e^{-\int_0^t r_u du}$ is the discount process. The solution to equation(\ref{hjm_bond_def}) is 
+    \[
+        B(t, T) = B(0,T) \exp\prt{\int_0^t r_u du + \int_0^t \sigma^B(u,T) dW_u - \frac{1}{2}\int_0^t  (\sigma^B(u,T))^2 du  }
+    \] 
+
+\end{theorem}
+
+\subsection{Markovian property}
+
+From equation (\ref{r_t_def}) and equation (\ref{hjm_fwd_def}) it can be
+verified that under risk neutral measure $Q$ the spot rate is
+\[
+    r_{t} = f(t,t)=f(0,t)+ \int_{0}^{t}\sigma^f(u,t)\sigma^B(u,t) du +
+    \int_{0}^{t}\sigma^f(u,t) dW_{u}
+\]
+
+If one focuses on the path dependent term by defining
+\[
+    G(t) =\int_{0}^{t}\sigma^f(u,t) dW_{u}
+\]
+Obviously it is generally not Markovian because
+\begin{eqnarray*}
+\E^Q( G(T)|G(t)) &=& \E^Q \left(G(t)+ \int_{t}^{T}\sigma^f(u,T) dW_{u}
++(\int_{0}^{t}\sigma^f(u,T) dW_{u} - \int_{0}^{t}\sigma^f(u,t) dW_{u}) |
+G(t)\right) \\
+                &\not=& E^Q_{t}(G(T))
+\end{eqnarray*}
+unless $\int_{0}^{t}\sigma^f(u,T) dW_{u} - \int_{0}^{t}\sigma^f(u,t) dW_{u}$
+is non random or a deterministic function of $G(t)$.
+
+An important area of investigation concerns the conditions under which $%
+r_{t} $ is Markov or less strictly, can be written as
+\[
+    r_{t} = h(t, x_{t})
+\]
+for a deterministic function $h$ and a finite-dimensional Markovian vector
+of state variables $x_{t}$. Following section presents an extended multi
+factor Hull-White model that satisfies Markovian property under certain
+conditions and is easy to implement in practice.
+
+
+\section{LGM model}
+
+
+\subsection{Model setup}
+A Linear Gaussian Markov(LGM) model assumes
+that the volatility $\sigma^f(t,T)$ of the forward rate $f(t,T)$ is deterministic with the form
+\begin{eqnarray}
+    \sigma^f(t,T) = \sigma_{t} e^{-\int_{t}^T\lambda _{s}ds}
+    \label{SF_def}
+\end{eqnarray}
+
+Based on the relation between $\sigma^B(t,T)$ and $\sigma^f(t,T)$ under HJM model, one can deduce that
+\begin{eqnarray}
+    \sigma^B(t,T) = -\int_t^T \sigma^f(t,s) ds = -\sigma_{t} \Lambda (t,T)  \label{SigmaB_def}
+\end{eqnarray}
+with
+\[
+    \Lambda (t,T)=\int_{t}^{T}e^{-\int_{t}^{s}\lambda _{u}du}ds
+    \label{lamda_def}    
+\]
+
+$\lambda_{t}$ can be seen the mean reversion rate of the short rate and is
+also assumed to be deterministic. It is the dampening factor for the
+volatility of the forward rate. If $\lambda$ is constant, then $\Lambda_{i}
+(t,T)= \frac{1-e^{-\lambda(T-t)}}{\lambda}$.
+
+In practice usually a multi-factor LGM model is used. In following sections by default we are in 
+a three factor LGM world, that is, $f(t,T)$ is driven by a correlated three dimensional Brownian motion
+$W$.
+
+By introducing the forward measure $Q^T$ under which the forward rate is a
+martingale, one writes the dynamics of the forward rate as 
+\[
+    f(t,T)=\sigma^f(t,T)\cdot dW^T_{t}    
+\]
+
+By definition in equation (\ref{r_t_def}) the spot rate under 3-factor model
+is expressed as
+\begin{eqnarray}
+r_{t} = f(t,t)=f(0,t)+ \sum^{3}_{i=1}x_{t}^i  \label{r_int}
+\end{eqnarray}
+\begin{eqnarray}
+    x^i_{t} = \int_{0}^t \sigma_{i}^f(s,t)dW_{s}^{t,i} =
+    -\int_{0}^t\sum_{j=1}^3\rho_{ij}\sigma_{j}^B(s,t)\sigma^f_{i}(s,t)ds+
+    \sigma^f_{i}(s,t)dW_{s}^{i}  
+    \label{x_int}
+\end{eqnarray}
+where $W_{s}^{i}$ is the Brownian motion under the risk neutral measure $Q$.
+
+It is noted that the deterministic property of $\sigma_{t}^i$ and $
+\lambda_{t}$ functions assures that the spot rate is Markovian. Indeed from
+equation and (\ref{r_int}) and (\ref{x_int}), $r_{t}$ is a function of $t$
+and $x_{t}$, where $x_{t}$ is a sum of a deterministic function and a
+Gaussian internal. Gaussian process are Markovian so is $r_{t}$.
+
+
+\begin{prop}
+    The factor $x_{t}^i$ evovles as 
+    \begin{eqnarray}
+        dx^i_{t} = \left(\sum_{j}\Phi_{t}^{ij}-\lambda_{t}^ix_{t}^i \right)dt+
+        \sigma_{t}^i dW_{t}^{i}  \label{x_SDE}
+    \end{eqnarray}
+    where $\Phi^{ij}_{t}= \mathrm{Cov}(x_{t}^i, x_{t}^j) =
+    \int_{0}^t\rho_{ij}\sigma^f_{j}(s,t)\sigma_{i}^f(s,t)ds$ is the covariance
+    matrix of the factors.
+\end{prop}
+
+\begin{proof}
+    By equation (\ref{x_int}) $x_{t}$ has the dynamics
+\begin{eqnarray*}
+    dx_{t}^{i}&=&-\int_{0}^{t}\underset{j}{\sum }\rho _{ij}d(\sigma
+    _{j}^{B}(s,t)\sigma _{i}^{f}(s,t))ds-\underset{j}{\sum }\rho _{ij}\sigma
+    _{j}^{B}(t,t)\sigma _{i}^{f}(t,t)+\sigma _{i}^{f}(t,t)dW_{s}^{\ast ,i} \\
+            &+&\int_{0}^{t}d\sigma _{i}^{f}(s,t)dW_{s}^{i}
+\end{eqnarray*}
+
+From equation (\ref{SF_def}) and (\ref{SigmaB_def}), it can be verified that
+\begin{eqnarray*}
+    d(\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)) &=&\sigma _{j}^{B}(s,t)d\sigma
+    _{i}^{f}(s,t)+\sigma _{i}^{f}(s,t)d\sigma _{j}^{B}(s,t) \\
+    &=& -\lambda _{t}^{i}\sigma _{i}^{f}(s,t)\sigma _{j}^{B}(s,t)dt-\sigma
+    _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dt
+\end{eqnarray*}
+
+As a result, it is obtained that
+\[
+    \int_{0}^{t}\underset{j}{\sum }\rho _{ij}d(\sigma _{j}^{B}(s,t)\sigma
+    _{i}^{f}(s,t))ds = \int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
+    _{t}^{i}\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)dtds-\int_{0}^{t}\underset{j}
+    {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dtds
+\]
+
+By definition of $\sigma^{B}(t,T)$ in equation (\ref{SigmaB_def}), one
+obtains
+\[
+    \sigma _{j}^{B}(t,t)=0
+\]
+
+By using Fubini's theorem for stochastic integral, one can evaluate the
+following integral as
+\[
+    \int_{0}^{t}d\sigma _{i}^{f}(s,t)dW_{s}^{i}=\int_{0}^{t}-\lambda
+    _{t}^{i}\sigma _{i}^{f}(s,t)dtdW_{s}^{i}=\int_{0}^{t}-\lambda _{t}^{i}\sigma
+    _{i}^{f}(s,t)dW_{s}^{i}dt
+\]
+
+Therefore the dynamics of $x_{t}$ is equivalent to
+\begin{eqnarray*}
+    dx_{t}^{i}&=&-\int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
+    _{t}^{i}\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)dtds+\int_{0}^{t}\underset{j}
+    {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dtds+\sigma
+    _{j}^{f}(t,t)dW_{s}^{\ast ,i} \\
+    &-&\int_{0}^{t}\lambda _{t}^{i}\sigma _{i}^{f}(s,t)dW_{s}^{\ast ,i}dt
+\end{eqnarray*}
+
+By switching the integral order again, it is further equivalent to
+\begin{eqnarray*}
+    dx_{t}^{i}&=& \prt{\int_{0}^{t}\underset{j}{\sum }\rho _{ij}\sigma
+    _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)ds-\lambda _{t}^{i}x_{t}^{i}}dt+\sigma
+    _{t}^{i}dW_{s}^{i} \\
+    &=&(\underset{j}{\sum }\Phi _{t}^{ij}-\lambda _{t}^{i}x_{t}^{i})dt+\sigma
+    _{t}^{i}dW_{s}^{i}
+\end{eqnarray*}
+where
+\[
+    \Phi _{t}^{ij}=cov(x_{t}^{i},x_{t}^{j})=\int_{0}^{t}\rho _{ij}\sigma
+    _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)ds   
+\]
+\end{proof}
+
+\newpage
+
+\begin{thebibliography}{99}
+\bibitem{Shreve} Steven Shreve, Stochastic Calculus for Finance II, {\it Springer Finance},  Springer, 2004. 
+
+\bibitem{Mercurio} Damiano Brigo and Fabio Mercurio. Interest rate models: theory and practice. {\it Springer Finance, 2nd edition}, Springer, 2006.
+
+\bibitem{Lewis} Harvey Stein. Valuation of exotic interest rate derivatives. {\it research note}, Bloomberg LP, December, 2007.
+
+\bibitem{Zeng} Yan Zeng. Elements of LGM model. {\it
+work note, version 1.0}, July, 2012.
+
+\bibitem{Xiong} Changwei Xiong. Introduction to interest rate models, {\it work note}, Nomura Singapore, June, 2018.
+
+\end{thebibliography}
+
+\end{document} 
