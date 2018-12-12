@@ -339,10 +339,10 @@ r_{t} = f(t,t)=f(0,t)+ \sum^{3}_{i=1}x_{t}^i  \label{r_int}
 \begin{eqnarray}
     x^i_{t} = \int_{0}^t \sigma_{i}^f(s,t)dW_{s}^{t,i} =
     -\int_{0}^t\sum_{j=1}^3\rho_{ij}\sigma_{j}^B(s,t)\sigma^f_{i}(s,t)ds+
-    \sigma^f_{i}(s,t)dW_{s}^{i}  
+    \int_{0}^t \sigma^f_{i}(s,t)dW_{s}^{*, i}  
     \label{x_int}
 \end{eqnarray}
-where $W_{s}^{i}$ is the Brownian motion under the risk neutral measure $Q$.
+where $W_{s}^{*,i}$ is the Brownian motion under the risk neutral measure $Q$.
 
 It is noted that the deterministic property of $\sigma_{t}^i$ and $
 \lambda_{t}$ functions assures that the spot rate is Markovian. Indeed from
@@ -352,7 +352,7 @@ Gaussian internal. Gaussian process are Markovian so is $r_{t}$.
 
 
 \begin{prop}
-    The factor $x_{t}^i$ evovles as 
+    The factor $x_{t}^i$ evolves as 
     \begin{eqnarray}
         dx^i_{t} = \left(\sum_{j}\Phi_{t}^{ij}-\lambda_{t}^ix_{t}^i \right)dt+
         \sigma_{t}^i dW_{t}^{i}  \label{x_SDE}
@@ -367,8 +367,8 @@ Gaussian internal. Gaussian process are Markovian so is $r_{t}$.
 \begin{eqnarray*}
     dx_{t}^{i}&=&-\int_{0}^{t}\underset{j}{\sum }\rho _{ij}d(\sigma
     _{j}^{B}(s,t)\sigma _{i}^{f}(s,t))ds-\underset{j}{\sum }\rho _{ij}\sigma
-    _{j}^{B}(t,t)\sigma _{i}^{f}(t,t)+\sigma _{i}^{f}(t,t)dW_{s}^{\ast ,i} \\
-            &+&\int_{0}^{t}d\sigma _{i}^{f}(s,t)dW_{s}^{i}
+    _{j}^{B}(t,t)\sigma _{i}^{f}(t,t) dt +\sigma _{i}^{f}(t,t)dW_{t}^{\ast ,i} \\
+            &+&\int_{0}^{t}d\sigma _{i}^{f}(s,t)dW_{s}^{*,i}
 \end{eqnarray*}
 
 From equation (\ref{SF_def}) and (\ref{SigmaB_def}), it can be verified that
@@ -379,44 +379,46 @@ From equation (\ref{SF_def}) and (\ref{SigmaB_def}), it can be verified that
     _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dt
 \end{eqnarray*}
 
-As a result, it is obtained that
-\[
+As a result, the first term of $d x^i_t$ arrives at
+\begin{eqnarray*}
     \int_{0}^{t}\underset{j}{\sum }\rho _{ij}d(\sigma _{j}^{B}(s,t)\sigma
-    _{i}^{f}(s,t))ds = \int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
+    _{i}^{f}(s,t))ds &=& -\int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
     _{t}^{i}\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)dtds-\int_{0}^{t}\underset{j}
-    {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dtds
-\]
+    {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dtds \\
+   &=& - \prt{ \int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
+   _{t}^{i}\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)ds} dt- \prt{\int_{0}^{t}\underset{j}
+   {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)ds}dt
+\end{eqnarray*}
 
 By definition of $\sigma^{B}(t,T)$ in equation (\ref{SigmaB_def}), one
 obtains
 \[
     \sigma _{j}^{B}(t,t)=0
 \]
+which implies the second term of $d x^i_t$ is zero.
 
-By using Fubini's theorem for stochastic integral, one can evaluate the
+The third term obviously equals to $\sigma^i_t d W^{*,i}_t$.
+
+To address the fourth term of $d x^i_t$, by applying Fubini's theorem to the stochastic integral, one can evaluate the
 following integral as
 \[
-    \int_{0}^{t}d\sigma _{i}^{f}(s,t)dW_{s}^{i}=\int_{0}^{t}-\lambda
-    _{t}^{i}\sigma _{i}^{f}(s,t)dtdW_{s}^{i}=\int_{0}^{t}-\lambda _{t}^{i}\sigma
-    _{i}^{f}(s,t)dW_{s}^{i}dt
+    \int_{0}^{t}d\sigma _{i}^{f}(s,t)dW_{s}^{*,i}=-\int_{0}^{t}\lambda
+    _{t}^{i}\sigma _{i}^{f}(s,t)dtdW_{s}^{*,i}=-\int_{0}^{t}\lambda _{t}^{i}\sigma
+    _{i}^{f}(s,t)dW_{s}^{*,i}dt 
 \]
 
 Therefore the dynamics of $x_{t}$ is equivalent to
 \begin{eqnarray*}
-    dx_{t}^{i}&=&-\int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
-    _{t}^{i}\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)dtds+\int_{0}^{t}\underset{j}
-    {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)dtds+\sigma
-    _{j}^{f}(t,t)dW_{s}^{\ast ,i} \\
-    &-&\int_{0}^{t}\lambda _{t}^{i}\sigma _{i}^{f}(s,t)dW_{s}^{\ast ,i}dt
-\end{eqnarray*}
-
-By switching the integral order again, it is further equivalent to
-\begin{eqnarray*}
-    dx_{t}^{i}&=& \prt{\int_{0}^{t}\underset{j}{\sum }\rho _{ij}\sigma
+    dx_{t}^{i} &=& \prt{ \int_{0}^{t}\underset{j}{\sum }\rho _{ij}\lambda
+    _{t}^{i}\sigma _{j}^{B}(s,t)\sigma _{i}^{f}(s,t)ds} dt +  \prt{\int_{0}^{t}\underset{j}
+    {\sum }\rho _{ij}\sigma _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)ds}dt \\
+    &+&\sigma^i_t d W^{*,i}_t -\lambda _{t}^{i}\int_{0}^{t}\sigma
+    _{i}^{f}(s,t)dW_{s}^{*,i}dt  \\
+    &=& \prt{\int_{0}^{t}\underset{j}{\sum }\rho _{ij}\sigma
     _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)ds-\lambda _{t}^{i}x_{t}^{i}}dt+\sigma
-    _{t}^{i}dW_{s}^{i} \\
+    _{t}^{i}dW_{t}^{i} \\
     &=&(\underset{j}{\sum }\Phi _{t}^{ij}-\lambda _{t}^{i}x_{t}^{i})dt+\sigma
-    _{t}^{i}dW_{s}^{i}
+    _{t}^{i}dW_{t}^{i}
 \end{eqnarray*}
 where
 \[
@@ -424,6 +426,91 @@ where
     _{i}^{f}(s,t)\sigma _{j}^{f}(s,t)ds   
 \]
 \end{proof}
+
+
+\begin{prop}
+    The covariance matrix $\Phi _{t}^{ij}$ evolves as 
+    \begin{eqnarray}
+        d\Phi _{t}^{ij} = (\rho _{ij}\sigma _{t}^{i}\sigma _{t}^{j}-(\lambda _{t}^{i}+\lambda
+        _{t}^{j})\Phi _{t}^{ij})dt  \label{phi_SDE}
+    \end{eqnarray}
+\end{prop}
+\begin{proof}
+\begin{eqnarray*}
+    d\Phi _{t}^{ij} &=&\rho _{ij}\sigma _{t}^{i}\sigma
+    _{t}^{j}dt+\int_{0}^{t}\rho _{ij}d(\sigma _{i}^{f}(s,t)\sigma
+    _{j}^{f}(s,t))ds \\
+    &=&\rho _{ij}\sigma _{t}^{i}\sigma _{t}^{j}dt+\int_{0}^{t}\rho
+    _{ij}(-\lambda _{t}^{i}-\lambda _{t}^{j})\sigma _{i}^{f}(s,t)\sigma
+    _{j}^{f}(s,t)dtds \\
+    &=&(\rho _{ij}\sigma _{t}^{i}\sigma _{t}^{j}-(\lambda _{t}^{i}+\lambda
+    _{t}^{j})\Phi _{t}^{ij})dt
+\end{eqnarray*}
+\end{proof}
+
+$\Phi^{ij}_{t}$ can be seen as the convexity adjustment due the fact that
+the short rate, or spot rate is not a martingale under the risk neutral
+measure.
+
+\subsection{Pricing formula}
+\begin{theorem}
+Under the above assumptions, the
+relationship between the factors and zero coupon is given by
+\begin{eqnarray}
+    B(t,T) = \frac{B(0,T)}{B(0,t)}\exp\left( -\frac{1}{2}\Lambda(t,T)^2\Phi(t) -
+    \Lambda(t,T)(r_{t}-f(0,t)) \right)  \label{rec_fomula}
+\end{eqnarray}
+\end{theorem}
+
+\begin{proof}
+
+By defintion of $B(t,T)$ and $B(t,t)$, $\frac{B(0,T)}{B(0,t)}$ is a
+martingale under forward measure $Q^t$, therefore it can be shown
+that
+
+\begin{eqnarray}
+\begin{split}
+    \frac{B(t,T)}{B(t,t)}=&\frac{B(0,T)}{B(0,t)}\\
+    &\exp
+\left(\int_{0}^{t}(\sigma _{{}}^{B}(s,T)-\sigma
+_{{}}^{B}(s,t))dW^t_{s}-\int_{0}^{t}\frac{1}{2}((\sigma
+_{{}}^{B}(s,T))^{2}-(\sigma _{{}}^{B}(s,t))^{2})ds\right)
+\end{split}
+\label{rec_formula_1}
+\end{eqnarray}
+        
+By definition of $\sigma _{{}}^{B}(s,T)$ and $\sigma _{{}}^{B}(s,t)$
+, using Fubini's theorem as well, the stochastic integral is then
+equivalent to
+\begin{eqnarray*}
+\int_{0}^{t}(\sigma _{{}}^{B}(s,T)-\sigma _{{}}^{B}(s,t))dW^t_{s}
+&=&\int_{0}^{t}\sigma _{s}^{{}}(\Lambda (s,T)-\Lambda (s,t))dW^t_{s}\\
+&=&-\int_{0}^{t}\sigma _{s}^{{}}(\int_{s}^{T}e^{-\int_{s}^{r}\lambda
+_{u}du}dr-\int_{s}^{t}e^{-\int_{s}^{r}\lambda _{u}du}dr)dW^t_{s}\\
+&=&-\int_{0}^{t}\sigma _{s}^{{}}\int_{t}^{T}e^{-\int_{s}^{r}\lambda
+_{u}du}drdW^t_{s}\\
+&=& -\int_{0}^{t}\sigma _{s}e^{-\int_{s}^{t}\lambda
+_{u}^idu}dW^t_{s} \int_{t}^{T}e^{-\int_{t}^{r}\lambda
+_{u}^idu}ds\\
+    &=&-x_{t}\Lambda (t,T)
+\end{eqnarray*}
+
+Its variance indeed is
+\[
+\mathrm{Var}(x_{t}\Lambda (t,T))=\Phi _{t}\Lambda (t,T)\cdot \Lambda
+(t,T)=\int_{0}^{t}\frac{1}{2}(\sigma _{{}}^{B}(s,T)-\sigma
+_{{}}^{B}(s,t))^{2}ds
+\]
+
+Therefore equation (\ref{rec_formula_1}) is equivalent to,
+\[
+\frac{B(t,T)}{B(t,t)}=\frac{B(0,T)}{B(0,t)}\exp (-\frac{1}{2}\Phi
+_{t}\Lambda (t,T)\cdot \Lambda (t,T)-x_{t}\Lambda (t,T))
+\]
+        
+\end{proof}
+
+
 
 \newpage
 
